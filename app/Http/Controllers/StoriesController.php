@@ -143,6 +143,9 @@ class StoriesController extends Controller
         // Paginate the story content on the backend
         $paginatedContent = $this->paginateStoryContent($story->content);
 
+        // Debug: Check the paginated content
+       
+
         return Inertia::render('Stories/Read', [
             'story' => $story,
             'paginatedContent' => $paginatedContent,
