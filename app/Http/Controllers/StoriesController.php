@@ -140,12 +140,155 @@ class StoriesController extends Controller
             }
         }
 
+        // Paginate the story content on the backend
+        $paginatedContent = $this->paginateStoryContent($story->content);
+
         return Inertia::render('Stories/Read', [
             'story' => $story,
+            'paginatedContent' => $paginatedContent,
             'auth' => [
                 'user' => Auth::user(),
             ],
         ]);
+    }
+
+    /**
+     * Paginate story content into pages suitable for book display
+     */
+    private function paginateStoryContent($content, $pageWidth = 460, $pageHeight = 600)
+    {
+        if (empty($content)) {
+            return [];
+        }
+
+        // Calculate available height accounting for padding (20px top + 20px bottom = 40px)
+        $availableHeight = $pageHeight - 40;
+        
+        // Split content into meaningful chunks (paragraphs, lists, headings, etc.)
+        // Use a more precise regex to capture complete HTML elements
+        $chunks = preg_split('/(<(?:p|div|ul|ol|h[1-6])[^>]*>.*?<\/(?:p|div|ul|ol|h[1-6])>)/is', $content, -1, PREG_SPLIT_DELIM_CAPTURE);
+        
+        // Filter out empty chunks and standalone tags
+        $chunks = array_filter($chunks, function($chunk) {
+            $trimmed = trim($chunk);
+            return !empty($trimmed) && !preg_match('/^<\/?(p|div|ul|ol|h[1-6])[^>]*>$/i', $trimmed);
+        });
+        
+        $pages = [];
+        $currentPage = '';
+        
+        foreach ($chunks as $chunk) {
+            $trimmedChunk = trim($chunk);
+            if (empty($trimmedChunk)) continue;
+            
+            $testContent = $currentPage . $trimmedChunk;
+            
+            // Simulate the content height by counting lines and characters
+            $estimatedHeight = $this->estimateContentHeight($testContent, $pageWidth);
+            
+            if ($estimatedHeight > $availableHeight && !empty($currentPage)) {
+                // Current page is full, save it and start new page
+                $pages[] = trim($currentPage);
+                
+                // Check if the current chunk is too long for one page
+                if ($this->estimateContentHeight($trimmedChunk, $pageWidth) > $availableHeight) {
+                    // Split by sentences if chunk is too long
+                    $textContent = strip_tags($trimmedChunk);
+                    $sentences = preg_split('/(?<=[.!?])\s+/', $textContent);
+                    
+                    $partialContent = '';
+                    $htmlTags = $this->extractHtmlTags($trimmedChunk);
+                    
+                    foreach ($sentences as $sentence) {
+                        $testSentence = $partialContent . ($partialContent ? ' ' : '') . $sentence;
+                        $testHTML = $this->wrapWithHtmlTags($testSentence, $htmlTags);
+                        
+                        if ($this->estimateContentHeight($testHTML, $pageWidth) > $availableHeight && !empty($partialContent)) {
+                            // Save this partial page
+                            $finalHTML = $this->wrapWithHtmlTags($partialContent, $htmlTags);
+                            $pages[] = trim($finalHTML);
+                            $partialContent = $sentence;
+                        } else {
+                            $partialContent = $testSentence;
+                        }
+                    }
+                    
+                    // Handle remaining content
+                    if (!empty(trim($partialContent))) {
+                        $currentPage = $this->wrapWithHtmlTags($partialContent, $htmlTags);
+                    } else {
+                        $currentPage = '';
+                    }
+                } else {
+                    $currentPage = $trimmedChunk;
+                }
+            } else {
+                // Add chunk to current page
+                $currentPage = $testContent;
+            }
+        }
+        
+        // Add the last page if it has content
+        if (!empty(trim($currentPage))) {
+            $pages[] = trim($currentPage);
+        }
+        
+        // Ensure we have pages and they're not empty
+        return array_filter($pages, function($page) {
+            return !empty($page) && strlen(trim($page)) > 0;
+        });
+    }
+
+    /**
+     * Extract HTML tags from content for reconstruction
+     */
+    private function extractHtmlTags($content)
+    {
+        $tags = [];
+        if (preg_match('/<([^>]+)>/', $content, $matches)) {
+            $tags['open'] = '<' . $matches[1] . '>';
+        }
+        if (preg_match('/<\/([^>]+)>/', $content, $matches)) {
+            $tags['close'] = '</' . $matches[1] . '>';
+        }
+        return $tags;
+    }
+
+    /**
+     * Wrap content with HTML tags
+     */
+    private function wrapWithHtmlTags($content, $tags)
+    {
+        if (empty($tags['open']) || empty($tags['close'])) {
+            return $content;
+        }
+        return $tags['open'] . $content . $tags['close'];
+    }
+
+    /**
+     * Estimate content height based on text content and container width
+     */
+    private function estimateContentHeight($content, $containerWidth)
+    {
+        // Remove HTML tags for text analysis
+        $textContent = strip_tags($content);
+        
+        // Basic estimation: assume average character width and line height
+        $avgCharWidth = 8; // pixels
+        $lineHeight = 25; // pixels (17px font-size * 1.6 line-height)
+        $padding = 40; // 20px top + 20px bottom
+        
+        // Calculate characters per line
+        $charsPerLine = floor($containerWidth / $avgCharWidth);
+        
+        // Calculate number of lines needed
+        $lines = ceil(strlen($textContent) / $charsPerLine);
+        
+        // Add some extra height for HTML elements (headings, paragraphs, etc.)
+        $htmlOverhead = substr_count($content, '<h') * 10; // Extra space for headings
+        $htmlOverhead += substr_count($content, '<p') * 5; // Extra space for paragraphs
+        
+        return ($lines * $lineHeight) + $padding + $htmlOverhead;
     }
 
     /**

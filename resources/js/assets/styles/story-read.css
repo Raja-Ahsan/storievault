@@ -302,16 +302,14 @@
     padding: 20px;
     height: 100%;
     overflow: hidden;
-    word-wrap: break-word;
-    line-height: 1.6;
-    font-size: 17px;
-    color: #333;
-    font-family: "Georgia", serif;
+    /* word-wrap: break-word; */
+    /* color: #333; */
+    font-family: var(--secondry-font);
     box-sizing: border-box;
     position: relative;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
+    /* display: flex; */
+    /* flex-direction: column; */
+    /* justify-content: flex-start; */
     /* background: linear-gradient(
         302deg,
         rgb(254 162 87 / 55%) 0%,

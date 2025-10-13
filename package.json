@@ -24,6 +24,7 @@
     "vite": "^6.2.4"
   },
   "dependencies": {
+    "@ckeditor/ckeditor5-react": "^11.0.0",
     "@coreui/chartjs": "^4.1.0",
     "@coreui/coreui": "^5.3.1",
     "@coreui/icons": "^3.0.1",

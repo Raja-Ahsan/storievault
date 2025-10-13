@@ -1647,6 +1647,13 @@ h6 {
 .footer-contact-info a:hover {
     color: var(--primary-theme);
 }
+
+.turn-book-wrapper .page-content p,
+.turn-book-wrapper .page-content span,
+.turn-book-wrapper .page-content li {
+  font-size: unset;
+  font-family: unset;
+}
 /* responsive */
 @media (min-width: 1560px) {
     .container {

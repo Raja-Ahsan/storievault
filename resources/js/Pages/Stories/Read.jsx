@@ -10,38 +10,14 @@ import { motion } from "framer-motion";
 import HTMLFlipBook from "react-pageflip";
 import Book from "../../Components/Book";
 import LikeButton from "@/Components/stories/LikeButton";
-import usePaginateByHeight from "@/hooks/usePaginateByHeight";
 
-export default function Read({ story, auth }) {
-    const getStoryContent = () => {
-        if (story.content) {
-            return story.content;
-        }
-
-        return `
-      <h2>${story.title}</h2>
-      <p class="author">By ${story.author}</p>
-
-      <p>${story.description}</p>
-
-      <p><em>This story is still being written. Check back soon for the full content!</em></p>
-    `;
-    };
+export default function Read({ story, paginatedContent, auth }) {
     const bookRef = useRef(null);
     const [currentPage, setCurrentPage] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
-    const storyContent = getStoryContent();
 
-    // Use pagination hook with book dimensions to preserve styling
-    const { pages: storyPages, isPaginating } = usePaginateByHeight(
-        storyContent,
-        460, // width (same as flipbook)
-        600, // height (same as flipbook)
-    );
-
-    // Debug log
-    console.log('Story content:', storyContent);
-    console.log('Story pages:', storyPages);
+    // Use backend paginated content instead of frontend pagination
+    const storyPages = paginatedContent || [];
 
     // Calculate total pages including front cover, story pages, and back cover
     const calculateTotalPages = () => {
@@ -231,7 +207,7 @@ export default function Read({ story, auth }) {
                             </div>
 
                             {/* Reading Content with Flipbook */}
-                            {isPaginating ? (
+                            {storyPages.length === 0 ? (
                                 <div className="text-center py-5">
                                     <div
                                         className="spinner-border text-primary"
@@ -272,6 +248,7 @@ export default function Read({ story, auth }) {
                                     allowCloseAfterBackCover={story.allow_close_after_back_cover !== false}
                                 />
                             )}
+                            {/* <div className="story-raw-preview" dangerouslySetInnerHTML={{ __html: story.content }} /> */}
 
                             {/* Chapter Navigation */}
                             <div className="chapter-navigation">

@@ -168,6 +168,7 @@ class StoriesController extends Controller
      * Display the specified story.
      */
     public function show(Story $story)
+
     {
         // Load the characters relationship
         $story->load('characters');

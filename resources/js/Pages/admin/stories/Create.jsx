@@ -42,6 +42,7 @@ const Create = ({ flash, ratings = [] }) => {
 
   const [newCharacter, setNewCharacter] = useState({ name: '', description: '' });
   const [preview, setPreview] = useState({ cover_image: null, backcover_image: null });
+  const [showHtml, setShowHtml] = useState(false);
 
   // Handle flash messages with SweetAlert
   useEffect(() => {
@@ -361,15 +362,36 @@ const Create = ({ flash, ratings = [] }) => {
                 
                 <CRow className="mb-3">
                   <CCol md={12}>
-                    <CFormLabel htmlFor="content">Story Content</CFormLabel>
-                    <div className={errors.content ? 'is-invalid' : ''}>
-                      <ReactQuill
-                        theme="snow"
-                        value={data.content}
-                        onChange={handleContentChange}
-                        style={{ minHeight: '300px', marginBottom: '50px' }}
-                      />
+                    <div className="d-flex justify-content-between align-items-center mb-2">
+                      <CFormLabel htmlFor="content">Story Content</CFormLabel>
+                      <CButton
+                        type="button"
+                        color="secondary"
+                        size="sm"
+                        onClick={() => setShowHtml(!showHtml)}
+                      >
+                        {showHtml ? 'Hide HTML' : 'Show HTML'}
+                      </CButton>
                     </div>
+                    
+                    {showHtml ? (
+                      <CFormTextarea
+                        value={data.content}
+                        onChange={(e) => setData('content', e.target.value)}
+                        rows={15}
+                        placeholder="HTML content..."
+                        className={errors.content ? 'is-invalid' : ''}
+                      />
+                    ) : (
+                      <div className={errors.content ? 'is-invalid' : ''}>
+                        <ReactQuill
+                          theme="snow"
+                          value={data.content}
+                          onChange={handleContentChange}
+                          style={{ minHeight: '300px', marginBottom: '50px' }}
+                        />
+                      </div>
+                    )}
                     
                   </CCol>
                 </CRow>
