@@ -4,6 +4,7 @@ import "../../css/book.css";
 
 
 const Book = forwardRef(({ pages = [], onInit, onFlip, coverImage, backcoverImage, allowCloseAfterBackCover = true }, bookRef) => {
+    
     const allPages = [
         // Front Cover
         // add a background image instead of the image tag

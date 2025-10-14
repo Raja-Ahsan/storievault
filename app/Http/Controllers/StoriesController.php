@@ -158,7 +158,7 @@ class StoriesController extends Controller
     /**
      * Paginate story content into pages suitable for book display
      */
-    private function paginateStoryContent($content, $pageWidth = 460, $pageHeight = 600)
+    private function paginateStoryContent($content, $pageWidth = 460, $pageHeight = 540)
     {
         if (empty($content)) {
             return [];
