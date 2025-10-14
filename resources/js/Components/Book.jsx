@@ -43,7 +43,7 @@ const Book = forwardRef(({ pages = [], onInit, onFlip, coverImage, backcoverImag
             <HTMLFlipBook
                 ref={bookRef}
                 width={460}
-                height={600}
+                height={665}
                 showCover={true}   // covers enable
                 mobileScrollSupport={true}
                 onInit={onInit}

@@ -19,7 +19,7 @@ class StoriesController extends Controller
     {
         // Only show non-community stories
         $query = Story::with('rating')->where('is_community', false);
-        
+
         // Filter by genre if provided
         if ($request->has('genre') && $request->genre !== 'all') {
             $query->where('genre', $request->genre);
@@ -108,7 +108,7 @@ class StoriesController extends Controller
     {
         // Load the characters and rating for this story
         $story->load(['characters', 'rating']);
-        
+
         // Get all ratings for the rating selector
         $ratings = \App\Models\Rating::orderBy('name')->get();
 
@@ -144,7 +144,7 @@ class StoriesController extends Controller
         $paginatedContent = $this->paginateStoryContent($story->content);
 
         // Debug: Check the paginated content
-       
+
 
         return Inertia::render('Stories/Read', [
             'story' => $story,
@@ -158,89 +158,107 @@ class StoriesController extends Controller
     /**
      * Paginate story content into pages suitable for book display
      */
-    private function paginateStoryContent($content, $pageWidth = 460, $pageHeight = 540)
+    private function paginateStoryContent($content, $pageWidth = 460, $pageHeight = 610)
     {
         if (empty($content)) {
             return [];
         }
 
-        // Calculate available height accounting for padding (20px top + 20px bottom = 40px)
         $availableHeight = $pageHeight - 40;
-        
-        // Split content into meaningful chunks (paragraphs, lists, headings, etc.)
-        // Use a more precise regex to capture complete HTML elements
-        $chunks = preg_split('/(<(?:p|div|ul|ol|h[1-6])[^>]*>.*?<\/(?:p|div|ul|ol|h[1-6])>)/is', $content, -1, PREG_SPLIT_DELIM_CAPTURE);
-        
-        // Filter out empty chunks and standalone tags
-        $chunks = array_filter($chunks, function($chunk) {
+
+        $chunks = preg_split(
+            '/(<(?:p|div|ul|ol|li|h[1-6])[^>]*>.*?<\/(?:p|div|ul|ol|li|h[1-6])>)/is',
+            $content,
+            -1,
+            PREG_SPLIT_DELIM_CAPTURE
+        );
+
+        $chunks = array_filter($chunks, function ($chunk) {
             $trimmed = trim($chunk);
-            return !empty($trimmed) && !preg_match('/^<\/?(p|div|ul|ol|h[1-6])[^>]*>$/i', $trimmed);
+            return !empty($trimmed) && !preg_match('/^<\/?(p|div|ul|ol|li|h[1-6])[^>]*>$/i', $trimmed);
         });
-        
+
         $pages = [];
         $currentPage = '';
-        
+
         foreach ($chunks as $chunk) {
             $trimmedChunk = trim($chunk);
             if (empty($trimmedChunk)) continue;
-            
+
             $testContent = $currentPage . $trimmedChunk;
-            
-            // Simulate the content height by counting lines and characters
             $estimatedHeight = $this->estimateContentHeight($testContent, $pageWidth);
-            
+
+            // page overflow
             if ($estimatedHeight > $availableHeight && !empty($currentPage)) {
-                // Current page is full, save it and start new page
                 $pages[] = trim($currentPage);
-                
-                // Check if the current chunk is too long for one page
+
+                // chunk itself exceeds one page, handle smart splitting
                 if ($this->estimateContentHeight($trimmedChunk, $pageWidth) > $availableHeight) {
-                    // Split by sentences if chunk is too long
-                    $textContent = strip_tags($trimmedChunk);
-                    $sentences = preg_split('/(?<=[.!?])\s+/', $textContent);
-                    
-                    $partialContent = '';
-                    $htmlTags = $this->extractHtmlTags($trimmedChunk);
-                    
-                    foreach ($sentences as $sentence) {
-                        $testSentence = $partialContent . ($partialContent ? ' ' : '') . $sentence;
-                        $testHTML = $this->wrapWithHtmlTags($testSentence, $htmlTags);
-                        
-                        if ($this->estimateContentHeight($testHTML, $pageWidth) > $availableHeight && !empty($partialContent)) {
-                            // Save this partial page
-                            $finalHTML = $this->wrapWithHtmlTags($partialContent, $htmlTags);
-                            $pages[] = trim($finalHTML);
-                            $partialContent = $sentence;
-                        } else {
-                            $partialContent = $testSentence;
+
+                    // handle lists separately
+                    if (preg_match('/^<ul|<ol/i', $trimmedChunk)) {
+                        preg_match_all('/<li[^>]*>.*?<\/li>/is', $trimmedChunk, $listItems);
+                        $items = $listItems[0];
+                        $partialContent = '';
+                        $htmlTags = $this->extractHtmlTags($trimmedChunk);
+
+                        foreach ($items as $li) {
+                            $testHTML = $partialContent . $li;
+                            if ($this->estimateContentHeight($testHTML, $pageWidth) > $availableHeight && !empty($partialContent)) {
+                                $finalHTML = $this->wrapWithHtmlTags($partialContent, $htmlTags);
+                                $pages[] = trim($finalHTML);
+                                $partialContent = $li;
+                            } else {
+                                $partialContent .= $li;
+                            }
                         }
-                    }
-                    
-                    // Handle remaining content
-                    if (!empty(trim($partialContent))) {
-                        $currentPage = $this->wrapWithHtmlTags($partialContent, $htmlTags);
+
+                        $currentPage = !empty(trim($partialContent))
+                            ? $this->wrapWithHtmlTags($partialContent, $htmlTags)
+                            : '';
                     } else {
-                        $currentPage = '';
+                        // handle paragraphs
+                        $textContent = strip_tags($trimmedChunk);
+                        $sentences = preg_split('/(?<=[.!?])\s+/', $textContent);
+
+                        $partialContent = '';
+                        $htmlTags = $this->extractHtmlTags($trimmedChunk);
+
+                        foreach ($sentences as $sentence) {
+                            $testSentence = $partialContent . ($partialContent ? ' ' : '') . $sentence;
+                            $testHTML = $this->wrapWithHtmlTags($testSentence, $htmlTags);
+                            $heightNow = $this->estimateContentHeight($testHTML, $pageWidth);
+
+                            if ($heightNow > $availableHeight && !empty($partialContent)) {
+                                // page full, save and continue remaining sentences
+                                $pages[] = trim($this->wrapWithHtmlTags($partialContent, $htmlTags));
+                                $partialContent = $sentence;
+                            } else {
+                                $partialContent = $testSentence;
+                            }
+                        }
+
+                        $currentPage = !empty(trim($partialContent))
+                            ? $this->wrapWithHtmlTags($partialContent, $htmlTags)
+                            : '';
                     }
                 } else {
                     $currentPage = $trimmedChunk;
                 }
             } else {
-                // Add chunk to current page
                 $currentPage = $testContent;
             }
         }
-        
-        // Add the last page if it has content
+
         if (!empty(trim($currentPage))) {
             $pages[] = trim($currentPage);
         }
-        
-        // Ensure we have pages and they're not empty
-        return array_filter($pages, function($page) {
-            return !empty($page) && strlen(trim($page)) > 0;
-        });
+
+        return array_filter($pages, fn($page) => !empty($page) && strlen(trim($page)) > 0);
     }
+    
+
+
 
     /**
      * Extract HTML tags from content for reconstruction
@@ -275,22 +293,22 @@ class StoriesController extends Controller
     {
         // Remove HTML tags for text analysis
         $textContent = strip_tags($content);
-        
+
         // Basic estimation: assume average character width and line height
         $avgCharWidth = 8; // pixels
         $lineHeight = 25; // pixels (17px font-size * 1.6 line-height)
         $padding = 40; // 20px top + 20px bottom
-        
+
         // Calculate characters per line
         $charsPerLine = floor($containerWidth / $avgCharWidth);
-        
+
         // Calculate number of lines needed
         $lines = ceil(strlen($textContent) / $charsPerLine);
-        
+
         // Add some extra height for HTML elements (headings, paragraphs, etc.)
         $htmlOverhead = substr_count($content, '<h') * 10; // Extra space for headings
         $htmlOverhead += substr_count($content, '<p') * 5; // Extra space for paragraphs
-        
+
         return ($lines * $lineHeight) + $padding + $htmlOverhead;
     }
 
@@ -339,21 +357,21 @@ class StoriesController extends Controller
         if ($packageWordsLimit > 0) {
             // Get today's date
             $today = now()->startOfDay();
-            
+
             // Get daily word usage (from community stories added today)
             $dailyStories = Story::where('user_id', $user->id)
                 ->where('is_community', true)
                 ->whereDate('created_at', $today)
                 ->get();
-                
+
             // Calculate current daily word usage
-            $currentDailyWords = $dailyStories->sum(function($story) {
+            $currentDailyWords = $dailyStories->sum(function ($story) {
                 return str_word_count(strip_tags($story->content));
             });
-            
+
             // Calculate new story word count
             $newStoryWords = str_word_count(strip_tags($data['content']));
-            
+
             // Check if adding this story would exceed the daily limit
             if (($currentDailyWords + $newStoryWords) > $packageWordsLimit) {
                 return response()->json([
@@ -440,7 +458,7 @@ class StoriesController extends Controller
         }
 
         $prefill = session('story_publish_data');
-        
+
         // Get package information from query parameters
         $packageData = null;
         if ($request->has('package') && $request->has('package_price')) {
