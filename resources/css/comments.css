@@ -1,0 +1,99 @@
+/* Comments Section Styles */
+.comments-section {
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  padding: 30px;
+  margin-top: 40px;
+}
+
+.comments-header h3 {
+  font-size: 24px;
+  color: #333;
+}
+
+.comment-form textarea {
+  border-radius: 8px;
+  resize: none;
+  font-size: 16px;
+  padding: 12px 15px;
+}
+
+.comment-item {
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.avatar-circle {
+  width: 40px;
+  height: 40px;
+  background-color: #6c5ce7;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.avatar-circle-sm {
+  width: 30px;
+  height: 30px;
+  font-size: 14px;
+}
+
+.comment-body p {
+  font-size: 16px;
+  line-height: 1.6;
+  color: #333;
+}
+
+.comment-actions {
+  margin-top: 10px;
+}
+
+.replies-container {
+  border-left: 2px solid #e0e0e0;
+}
+
+.reply-item {
+  background-color: #f5f5f5;
+  border-radius: 8px;
+  padding: 15px;
+}
+
+.fs-14 {
+  font-size: 14px;
+}
+
+/* Dropdown menu for comment actions */
+.dropdown-menu {
+  min-width: 120px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.dropdown-item {
+  padding: 8px 15px;
+  font-size: 14px;
+}
+
+.dropdown-item:hover {
+  background-color: #f5f5f5;
+}
+
+.dropdown-item.text-danger:hover {
+  background-color: #fee;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .comments-section {
+    padding: 20px 15px;
+  }
+  
+  .comment-item {
+    padding: 15px;
+  }
+}

@@ -1,0 +1,72 @@
+.bl-image-size {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+}
+.swal2-container button {
+    color: #fff;
+}
+.blog-detail-img,
+.single-blog-content-top img {
+    max-width: 100%;
+    width: 100%;
+    max-height: 430px;
+    object-fit: cover;
+    object-position: top;
+}
+.blog-show-page .blog-detail-img {
+    max-height: 190px;
+}
+
+.circle-wrap {
+  width: 120px;
+  height: 120px;
+  background: #e6e2e7;
+  border-radius: 50%;
+  position: relative;
+  margin: auto;
+}
+.circle-wrap .circle .mask,
+.circle-wrap .circle .fill {
+  width: 120px;
+  height: 120px;
+  position: absolute;
+  border-radius: 50%;
+}
+.circle-wrap .circle {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  clip: rect(0px, 120px, 120px, 60px);
+}
+.circle-wrap .circle .mask {
+  clip: rect(0px, 60px, 120px, 0px);
+}
+.circle-wrap .circle .mask .fill {
+  background-color: #5a99d4;
+  clip: rect(0px, 120px, 120px, 60px);
+}
+.circle-wrap .inside-circle {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  background: #fff;
+  line-height: 90px;
+  text-align: center;
+  margin: auto;
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  font-weight: bold;
+  font-size: 20px;
+}
+.blog-detail-img-wrapper {
+  background: #d7d7d7;
+  padding: 3px;
+}
+img.for-light {
+  filter: brightness(0) saturate(100%) invert(8%) sepia(8%) saturate(4960%) hue-rotate(166deg) brightness(91%) contrast(103%);
+}
+img.for-dark {
+  filter: none;
+}

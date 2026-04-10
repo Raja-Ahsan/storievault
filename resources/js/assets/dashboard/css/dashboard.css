@@ -1,0 +1,185 @@
+body {
+  font-family: 'Poppins', sans-serif;
+}
+
+.sidebar-nav .nav-group:hover,
+.sidebar-nav .nav-item:hover {
+  background-color: #202020;
+}
+
+.sidebar-nav .simplebar-content {
+  padding: 10px 0 !important;
+}
+
+.sidebar-nav .nav-item {
+  padding: 0 !important;
+}
+
+.arrow-redirect-btn {
+  border: 1px solid #fea257;
+  border-radius: 4px;
+  padding: 5px;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.arrow-redirect-btn:hover {
+  border: 1px solid #74989e;
+}
+
+.card-header a {
+  text-decoration: none;
+}
+
+.custom-primary-btn {
+  display: flex;
+  align-items: center;
+
+}
+
+/* span,
+p,
+strong {
+  background-color: transparent !important;
+} */
+
+.page-content span,
+.page-content div,
+.page-content p,
+.page-content h1,
+.page-content h2,
+.page-content h3,
+.page-content h4,
+.page-content h5,
+.page-content h6,
+.page-content em,
+.page-content i,
+.page-content strong,
+.page-content b,
+.page-content a {
+  background-color: transparent !important;
+  background: transparent !important;
+}
+
+/* user dashboard css */
+.dashboard-card-wrapper {
+  background-image: url('/assets/dashboard/images/cards-bg-image.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  padding: 20px;
+  border-radius: 10px;
+  color: #fff;
+  font-size: 18px;
+  font-weight: 600;
+
+  transition: all 0.3s ease;
+  letter-spacing: 0.5px;
+  border-radius: 15px;
+  box-shadow: 0px 9px 20px rgba(46, 35, 94, 0.07);
+}
+
+.dashboard-card-wrapper:hover {
+  transform: translateY(-5px);
+  transition: 0.5s;
+}
+
+.dashboard-card-wrapper .card-title {
+  color: #202020;
+  font-size: 16px;
+}
+
+.dcw-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-color: #fff;
+  color: #74989e;
+  font-size: 24px;
+  border: 1px solid #fea257;
+}
+
+.btn-primary,
+.bg-primary-theme {
+  background-color: rgb(254 162 87);
+}
+
+.btn-primary {
+  border: none;
+}
+
+.btn-primary:focus,
+.btn-primary:active,
+.btn-primary:hover {
+  background-color: #74989e !important;
+}
+
+.text-secondary-theme {
+  color: #74989e;
+}
+
+.text-24 {
+  font-size: 24px;
+}
+
+.sm-check-cirlce {
+  width: 25px;
+  height: 25px;
+  font-size: 11px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #fea257;
+}
+
+.bg-primary {
+  background-color: #fea257 !important;
+}
+
+.form-control:focus {
+  box-shadow: none !important;
+  border-color: var(--cui-border-color) !important;
+}
+
+.border-none {
+  border: none !important;
+}
+
+:root {
+  --cui-primary: #fea257;
+  --cui-secondary: #74989e;
+  --cui-btn-bg: var(--cui-primary);
+  --cui-btn-border-color: var(--cui-primary);
+  --cui-btn-color: var(--cui-primary);
+}
+
+
+.btn-outline-primary {
+  --cui-btn-color: var(--cui-primary);
+  --cui-btn-border-color: var(--cui-primary);
+  --cui-btn-hover-color: #fff;
+  --cui-btn-hover-bg: var(--cui-primary);
+  --cui-btn-hover-border-color: var(--cui-primary);
+  --cui-btn-focus-shadow-rgb: 254, 162, 87; /* RGB of your primary color */
+  --cui-btn-active-color: #fff;
+  --cui-btn-active-bg: var(--cui-primary);
+  --cui-btn-active-border-color: var(--cui-primary);
+  --cui-btn-disabled-color: var(--cui-primary);
+  --cui-btn-disabled-bg: transparent;
+  --cui-btn-disabled-border-color: var(--cui-primary);
+}
+
+/* .btn-outline-primary {
+  --cui-btn-color: #fea257;
+  --cui-btn-hover-border-color: #fea257;
+} */
+
+.dropdown-menu {}

@@ -1,0 +1,38 @@
+.turn-book-wrapper {
+  width: 100%;
+  max-width: 920px;
+  max-height: calc(85vh - 2rem) !important;
+  overflow: hidden;
+  justify-content: center;
+  align-items: center;
+}
+.flip-book .page:nth-child(1)::before {
+  display: none !important;
+}
+
+/* .page-content {
+  height: 100%;
+  box-sizing: border-box;
+  overflow: hidden; 
+  word-wrap: break-word;
+  line-height: 1.6;
+  font-size: 17px;
+  font-family: 'poppins', serif;
+  color: #333;
+} */
+
+.book-cover {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #111;
+}
+.turn-book-wrapper .book-cover img {
+  object-position: top;
+}
+
+.cover-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}

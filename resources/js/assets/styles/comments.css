@@ -1,0 +1,203 @@
+/* Comments Section Styles */
+@keyframes highlight-fade {
+  0% {
+    background-color: rgba(17, 0, 0, 0.05);
+    box-shadow: 0 0 10px rgba(17, 0, 0, 0.2);
+  }
+  100% {
+    background-color: #fff;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  }
+}
+
+.optimistic-comment {
+  animation: highlight-fade 2s ease-out;
+  border-left: 3px solid var(--secondry-theme, #6c5ce7);
+}
+
+/* Modal styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(17, 0, 0, 0.7); /* Using your theme color #110000 with opacity */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1050;
+  backdrop-filter: blur(3px);
+}
+
+.modal-content {
+  background-color: white;
+  border-radius: 10px;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 10px 25px rgba(17, 0, 0, 0.3); /* Themed shadow */
+  overflow: hidden;
+  border: 1px solid rgba(17, 0, 0, 0.1);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  border-bottom: 1px solid #eee;
+  background-color: #f8f8f8;
+}
+
+.modal-body {
+  padding: 30px 20px;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: #777;
+  transition: color 0.2s ease;
+}
+
+.close-btn:hover {
+  color: #110000; /* Theme color */
+}
+
+.delete-icon {
+  margin: 0 auto 20px;
+  background-color: rgba(220, 53, 69, 0.1);
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 5px 15px rgba(220, 53, 69, 0.2);
+}
+.comments-section {
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  padding: 30px;
+  margin-top: 40px;
+  border-top: 3px solid var(--secondry-theme, #6c5ce7);
+}
+
+.comments-header h3 {
+  font-size: 24px;
+  color: #333;
+}
+
+.comment-form textarea {
+  border-radius: 8px;
+  resize: none;
+  font-size: 16px;
+  padding: 12px 15px;
+  height: 100%;
+}
+
+/* Comment form button styles */
+.comment-form button[type="submit"] {
+  min-width: 120px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.radius-30 {
+  border-radius: 30px;
+}
+
+.py-5 {
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+
+.px-10 {
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.comment-item {
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.avatar-circle {
+  width: 40px;
+  height: 40px;
+  background-color: var(--secondry-theme, #6c5ce7);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.avatar-circle-sm {
+  width: 30px;
+  height: 30px;
+  font-size: 14px;
+}
+
+.comment-body p {
+  font-size: 16px;
+  line-height: 1.6;
+  color: #333;
+}
+
+.comment-actions {
+  margin-top: 10px;
+}
+
+.replies-container {
+  border-left: 2px solid var(--secondry-theme, #6c5ce7);
+  border-left-style: dashed;
+}
+
+.reply-item {
+  background-color: #f5f5f5;
+  border-radius: 8px;
+  padding: 15px;
+}
+
+.fs-14 {
+  font-size: 14px;
+}
+
+/* Dropdown menu for comment actions */
+.dropdown-menu {
+  min-width: 120px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.dropdown-item {
+  padding: 8px 15px;
+  font-size: 14px;
+}
+
+.dropdown-item:hover {
+  background-color: #f5f5f5;
+}
+
+.dropdown-item.text-danger:hover {
+  background-color: #fee;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .comments-section {
+    padding: 20px 15px;
+  }
+
+  .comment-item {
+    padding: 15px;
+  }
+}
