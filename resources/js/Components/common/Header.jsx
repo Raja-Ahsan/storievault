@@ -132,9 +132,7 @@ const Header = ({ logoClass, headerClass }) => {
                                 <li>
                                     <Link href="/community">Community</Link>
                                 </li>
-                                <li>
-                                    <Link href="/blog">Blog</Link>
-                                </li>
+                                
                                 <li>
                                     <Link href="/contests">Contests</Link>
                                 </li>
@@ -367,11 +365,7 @@ const Header = ({ logoClass, headerClass }) => {
                             Community
                         </Link>
                     </li>
-                    <li>
-                        <Link href="/blog" onClick={() => setIsMenuOpen(false)}>
-                            Blog
-                        </Link>
-                    </li>
+                    
                     <li>
                         <Link
                             href="/contests"

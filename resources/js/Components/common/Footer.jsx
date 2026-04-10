@@ -23,6 +23,7 @@ const Footer = () => {
                 <li><Link href="/community">Community</Link></li>
                 <li><Link href="/publish">Publish</Link></li>
                 <li><Link href="/about">About</Link></li>
+                <li><Link href="/blog">Blog</Link></li>
               </ul>
             </div>
             <div className="col-lg-2">
