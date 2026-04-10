@@ -1874,6 +1874,9 @@ h6 {
     border-radius: 10px !important;
     
 } 
+.logo img {
+    max-width: 150px !important;
+}
 /* responsive */
 @media (min-width: 1560px) {
     .container {
