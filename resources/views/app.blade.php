@@ -4,8 +4,31 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
+<<<<<<< HEAD
         <base href="/" />
         <title inertia>{{ config('app.name', 'Laravel') }}</title>
+=======
+        <!-- google site verification -->
+        <meta name="google-site-verification" content="Sx6feX4ZcWsScQKKZhPgQKGi1d-jpsGVnwzn_f721E4" />
+        <base href="/" />
+        <title inertia>StoriVault</title>
+
+        <!-- Canonical Link -->
+        <link rel="canonical" href="{{ request()->routeIs('home') ? 'https://www.storievault.com/' : url()->current() }}" />
+
+        <!-- Google Analytics (gtag.js) -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-PJW3ZTKPGD"></script>
+        <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-PJW3ZTKPGD');
+        </script>
+
+        <!-- Favicons -->
+        <link rel="icon" href="{{ asset('assets/images/fav.png') }}" type="image/png" />
+        <link rel="shortcut icon" href="{{ asset('assets/images/fav.png') }}" type="image/png" />
+>>>>>>> live-main
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -16,7 +39,11 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
          <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<<<<<<< HEAD
     <script src="{{ asset('assets/turn/turn.min.js') }}"></script>
+=======
+    {{-- <script src="{{ asset('assets/turn/turn.min.js') }}"></script> --}}
+>>>>>>> live-main
         <!-- Scripts -->
         @routes
         @viteReactRefresh

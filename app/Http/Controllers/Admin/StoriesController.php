@@ -84,10 +84,17 @@ class StoriesController extends Controller
 
     public function create()
     {
+<<<<<<< HEAD
         $ratings = \App\Models\Rating::orderBy('name')->get();
         
         return Inertia::render('admin/stories/Create', [
             'ratings' => $ratings
+=======
+        $categories = \App\Models\Category::orderBy('name')->get();
+        
+        return Inertia::render('admin/stories/Create', [
+            'categories' => $categories
+>>>>>>> live-main
         ]);
     }
 
@@ -99,6 +106,7 @@ class StoriesController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'required|string',
+<<<<<<< HEAD
             'author' => 'required|string|max:255',
             'genre' => 'required|string|max:100',
             'rating' => 'nullable|string|exists:ratings,name',
@@ -116,13 +124,32 @@ class StoriesController extends Controller
             $rating = \App\Models\Rating::where('name', $validated['rating'])->first();
             $ratingId = $rating ? $rating->id : null;
         }
+=======
+            'category' => 'required|exists:categories,id',
+            'content' => 'required|string',
+            'cover_image' => 'required|image|max:2048', // Max 2MB
+            'backcover_image' => 'required|image|max:2048', // Max 2MB
+        ]);
+
+        // Get category name from category ID
+        $category = \App\Models\Category::findOrFail($validated['category']);
+        
+        // Get logged-in admin user
+        $user = \Illuminate\Support\Facades\Auth::user();
+>>>>>>> live-main
 
         $storyData = [
             'title' => $validated['title'],
             'description' => $validated['description'],
+<<<<<<< HEAD
             'author' => $validated['author'],
             'genre' => $validated['genre'],
             'rating_id' => $ratingId,
+=======
+            'author' => $user->username, // Use username as author
+            'genre' => $category->name, // Store category name in genre field
+            'rating_id' => null,
+>>>>>>> live-main
             'content' => $validated['content'],
             'is_community' => false, // Admin-created stories are not community stories
             'read_count' => 0,
@@ -144,6 +171,7 @@ class StoriesController extends Controller
 
         $story = Story::create($storyData);
 
+<<<<<<< HEAD
         // Create characters for the story if provided
         if (isset($validated['characters']) && is_array($validated['characters'])) {
             foreach ($validated['characters'] as $characterData) {
@@ -154,6 +182,8 @@ class StoriesController extends Controller
             }
         }
 
+=======
+>>>>>>> live-main
        
 
 
@@ -227,11 +257,24 @@ class StoriesController extends Controller
 
         // Handle cover image upload
         if ($request->hasFile('cover_image')) {
+<<<<<<< HEAD
             $path = $request->file('cover_image')->store('cover_images', 'public');
+=======
+            if ($story->cover_image) {
+                Storage::disk('public')->delete($story->cover_image);
+            }
+            $path = $request->file('cover_image')->store('admin_stories/cover_images', 'public');
+>>>>>>> live-main
             $storyData['cover_image'] = $path;
         }
 
         if ($request->hasFile('backcover_image')) {
+<<<<<<< HEAD
+=======
+            if ($story->backcover_image) {
+                Storage::disk('public')->delete($story->backcover_image);
+            }
+>>>>>>> live-main
             $path = $request->file('backcover_image')->store('admin_stories/backcover_images', 'public');
             $storyData['backcover_image'] = $path;
         }

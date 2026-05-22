@@ -26,5 +26,21 @@ return Application::configure(basePath: dirname(__DIR__))
 
     })
     ->withExceptions(function (Exceptions $exceptions) {
+<<<<<<< HEAD
         //
+=======
+        // Wrong URL ya missing resource (404) → home redirect
+        $exceptions->respond(function ($response, $exception, $request) {
+            if ($request->expectsJson()) {
+                return $response;
+            }
+            if (in_array($exception::class, [
+                \Symfony\Component\HttpKernel\Exception\NotFoundHttpException::class,
+                \Illuminate\Database\Eloquent\ModelNotFoundException::class,
+            ])) {
+                return redirect()->route('home');
+            }
+            return $response;
+        });
+>>>>>>> live-main
     })->create();

@@ -34,7 +34,10 @@ const Create = ({ flash }) => {
         price_cents: "",
         interval: "",
         features: [""],
+<<<<<<< HEAD
         stripe_price_id: "",
+=======
+>>>>>>> live-main
         is_active: "1",
         words_limit: "",
         stories_limit: "",
@@ -62,7 +65,11 @@ const Create = ({ flash }) => {
     // Warn user about unsaved changes
     useEffect(() => {
         const handleBeforeUnload = (e) => {
+<<<<<<< HEAD
             if (data.name || data.price_cents || data.interval || data.stripe_price_id) {
+=======
+            if (data.name || data.price_cents || data.interval) {
+>>>>>>> live-main
                 e.preventDefault();
                 e.returnValue = '';
             }
@@ -110,10 +117,13 @@ const Create = ({ flash }) => {
             newErrors.features = "At least one feature is required";
         }
 
+<<<<<<< HEAD
         if (!data.stripe_price_id || data.stripe_price_id.trim() === "") {
             newErrors.stripe_price_id = "Stripe Price ID is required";
         }
 
+=======
+>>>>>>> live-main
         if (!data.words_limit || isNaN(data.words_limit) || data.words_limit <= 0) {
             newErrors.words_limit = "Valid words limit is required";
         }
@@ -183,7 +193,10 @@ const Create = ({ flash }) => {
                 if (errors.name) errorMessage = errors.name;
                 else if (errors.price_cents) errorMessage = errors.price_cents;
                 else if (errors.interval) errorMessage = errors.interval;
+<<<<<<< HEAD
                 else if (errors.stripe_price_id) errorMessage = errors.stripe_price_id;
+=======
+>>>>>>> live-main
                 else if (errors.words_limit) errorMessage = errors.words_limit;
                 else if (errors.stories_limit) errorMessage = errors.stories_limit;
                 else if (errors.features) errorMessage = errors.features;
@@ -390,6 +403,7 @@ const Create = ({ flash }) => {
                                 </CRow>
 
                                 <CRow className="mb-3">
+<<<<<<< HEAD
                                     <CCol md={6}>
                                         <CFormLabel htmlFor="stripe_price_id">
                                             Stripe Price ID
@@ -419,6 +433,9 @@ const Create = ({ flash }) => {
                                         )}
                                     </CCol>
                                     <CCol md={6}>
+=======
+                                    <CCol md={12}>
+>>>>>>> live-main
                                         <CFormLabel htmlFor="badge">
                                             Badge
                                         </CFormLabel>
@@ -446,12 +463,19 @@ const Create = ({ flash }) => {
                                         )}
                                     </CCol>
                                 </CRow>
+<<<<<<< HEAD
                                 <CRow className="mb-3">
+=======
+                                {/* <CRow className="mb-3">
+>>>>>>> live-main
                                     <CCol md={6}>
                                         <CFormLabel htmlFor="name">
                                             Words Limit
                                         </CFormLabel>
+<<<<<<< HEAD
                                         {/* add type number in words limit input */}
+=======
+>>>>>>> live-main
                                         <CFormInput
                                             id="words_limit"
                                             type="number"
@@ -493,7 +517,11 @@ const Create = ({ flash }) => {
                                             </div>
                                         )}
                                     </CCol>
+<<<<<<< HEAD
                                 </CRow>
+=======
+                                </CRow> */}
+>>>>>>> live-main
                                 
 
                                 <CRow className="mb-3">

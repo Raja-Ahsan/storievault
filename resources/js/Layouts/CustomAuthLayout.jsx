@@ -33,7 +33,11 @@ export default function CustomAuthLayout({ children, title }) {
             <div className="bg-white p-4 p-md-5 rounded-4 shadow-sm auth-card">
               <div className="text-center mb-4">
                 <Link href="/" className="d-inline-block">
+<<<<<<< HEAD
                   <img src="/assets/images/logo.png" alt="logo" className="mb-3" style={{ maxWidth: '110px', margin: '0 auto' }} />
+=======
+                  <img src="/assets/images/logo.webp" alt="logo" className="mb-3" style={{ maxWidth: '110px', margin: '0 auto' }} />
+>>>>>>> live-main
                   <span className="d-block text-primary-theme fs-24 tertiary-font">Verba aeternum fluentia</span>
                   <span className="d-block light-black fs-18 secondry-font">(Words flowing eternally)</span>
                 </Link>

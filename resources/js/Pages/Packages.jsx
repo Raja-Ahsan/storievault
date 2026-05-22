@@ -665,7 +665,11 @@ const Packages = ({ packages = [] }) => {
 
                                         {/* Features List */}
                                         <div className="mb-40 package-features">
+<<<<<<< HEAD
                                             <div className="package-feature-item">
+=======
+                                            {/* <div className="package-feature-item">
+>>>>>>> live-main
                                                 {
                                                     packageItem.words_limit > 0 ? (
                                                         <div className={`feature-check-icon`}>
@@ -680,7 +684,11 @@ const Packages = ({ packages = [] }) => {
                                                         </div>
 
                                                     ) : (
+<<<<<<< HEAD
                                                         ""
+=======
+                                                        ""Set up a full-stack Learning Management System (LMS) project using React + Laravel + MySQL + Tailwind + Vite. Configure the necessary packages and dependencies for React, Laravel (Backend API), MySQL, and Tailwind with Vite for fast development.
+>>>>>>> live-main
                                                     )
                                                 }
                                                 <span className="para-mid feature-text">
@@ -724,14 +732,22 @@ const Packages = ({ packages = [] }) => {
                                                     )
                                                 }
                                                 </span>
+<<<<<<< HEAD
                                             </div>
+=======
+                                            </div> */}
+>>>>>>> live-main
                                             {packageItem.features.map(
                                                 (feature, index) => (
                                                     <div
                                                         key={index}
                                                         className="package-feature-item"
                                                     >
+<<<<<<< HEAD
                                                         <div
+=======
+                                                        {/* <div
+>>>>>>> live-main
                                                             className={`feature-check-icon ${feature.isNegative ? "feature-cross-icon" : ""}`}
                                                         >
                                                             {feature.isNegative ? (
@@ -746,10 +762,17 @@ const Packages = ({ packages = [] }) => {
                                                                     <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
                                                                 </svg>
                                                             )}
+<<<<<<< HEAD
                                                         </div>
                                                         <span className="para-mid feature-text">
                                                             {feature.text}
                                                         </span>
+=======
+                                                        </div> */}
+                                                        {/* <span className="para-mid feature-text">
+                                                            {feature.text}
+                                                        </span> */}
+>>>>>>> live-main
                                                     </div>
                                                 ),
                                             )}

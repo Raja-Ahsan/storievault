@@ -14,6 +14,7 @@ class StoriesController extends Controller
 {
     /**
      * Display a listing of the stories.
+<<<<<<< HEAD
      */
     public function index(Request $request)
     {
@@ -28,6 +29,40 @@ class StoriesController extends Controller
         // Filter by rating if provided
         if ($request->has('rating') && $request->rating !== 'all') {
             $query->where('rating_id', $request->rating);
+=======
+     *
+     * @param  string|null  $category_slug  From route /{slug}-stories (e.g. adventure)
+     */
+    public function index(Request $request, ?string $category_slug = null)
+    {
+        // If old '?category=' format is used, permanently redirect to new slug format for better SEO
+        if ($category_slug === null && $request->has('category') && !empty($request->category)) {
+            return redirect()->route('stories.category', ['category_slug' => $request->category], 301);
+        }
+
+        if ($category_slug !== null && $category_slug !== '') {
+            $request->merge(['category' => $category_slug]);
+        }
+ 
+        
+        // Show both community and non-community stories
+        // Non-community stories (admin-created) are always shown
+        // Community stories (user-created) are shown regardless of status
+        $query = Story::with('rating')
+            ->where(function($q) {
+                // Show non-community stories (admin-created)
+                $q->where('is_community', false)
+                // Or show community stories (user-created) - show all statuses
+                  ->orWhere('is_community', true);
+            });
+        
+        // Filter by category if provided
+        if ($request->has('category') && !empty($request->category)) {
+            $category = \App\Models\Category::where('slug', $request->category)->first();
+            if ($category) {
+                $query->where('genre', $category->name);
+            }
+>>>>>>> live-main
         }
 
         // Search by title or description if provided
@@ -53,14 +88,40 @@ class StoriesController extends Controller
         // We'll keep the data refresh to ensure accurate counts
         // but we won't force a page refresh in the frontend
         foreach ($stories as $key => $story) {
+<<<<<<< HEAD
             $stories[$key] = $story->fresh(['rating']);
+=======
+            $freshStory = $story->fresh(['rating']);
+            $freshStory->setAppends(['created_at_formatted', 'cover_image_url', 'backcover_image_url']);
+            $averageRating = \App\Models\StoryRating::where('story_id', $freshStory->id)->avg('rating');
+            $freshStory->average_rating = $averageRating ? number_format($averageRating, 1) : null;
+            $stories[$key] = $freshStory;
+        }
+
+        $categoryPage = null;
+        if ($request->filled('category')) {
+            $catModel = \App\Models\Category::where('slug', $request->category)->first();
+            if ($catModel) {
+                $categoryPage = [
+                    'meta_title' => $catModel->meta_title,
+                    'meta_description' => $catModel->meta_description,
+                    'content' => $catModel->content,
+                    'faqs' => $catModel->faqs ?? [],
+                ];
+            }
+>>>>>>> live-main
         }
 
         return Inertia::render('Stories/Index', [
             'stories' => $stories,
+<<<<<<< HEAD
             'genres' => $genres,
             'ratings' => $ratings,
             'filters' => $request->only(['search', 'genre', 'rating']),
+=======
+            'filters' => $request->only(['search', 'category']),
+            'categoryPage' => $categoryPage,
+>>>>>>> live-main
             'flash' => [
                 'success' => session('success'),
                 'error' => session('error'),
@@ -623,4 +684,91 @@ class StoriesController extends Controller
             ], 500);
         }
     }
+<<<<<<< HEAD
+=======
+
+    /**
+     * Show the form for creating a new story.
+     */
+    public function createStory()
+    {
+        // Check if user is logged in
+        if (!Auth::check()) {
+            return redirect()->route('login')->with('error', 'You must be logged in to create stories.');
+        }
+
+        $user = Auth::user();
+
+        // Check if user has active subscription
+        if (!$user->subscription || $user->subscription->stripe_status !== 'active') {
+            return redirect()->route('packages')->with('error', 'Active subscription required to create stories');
+        }
+
+        $categories = \App\Models\Category::orderBy('name')->get();
+        
+        return Inertia::render('Stories/CreateStory', [
+            'categories' => $categories
+        ]);
+    }
+
+    /**
+     * Store a newly created story.
+     */
+    public function storeStory(Request $request)
+    {
+        $user = Auth::user();
+
+        // Check if user is logged in
+        if (!Auth::check()) {
+            return redirect()->route('login')->with('error', 'You must be logged in to create stories.');
+        }
+
+        // Check if user has active subscription
+        if (!$user->subscription || $user->subscription->stripe_status !== 'active') {
+            return redirect()->back()->with('error', 'Active subscription required to create stories');
+        }
+        
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'required|string',
+            'category' => 'required|exists:categories,id',
+            'content' => 'required|string',
+            'cover_image' => 'required|image',
+            'backcover_image' => 'required|image',
+        ]);
+
+        // Get category name from category ID
+        $category = \App\Models\Category::findOrFail($validated['category']);
+
+        $storyData = [
+            'title' => $validated['title'],
+            'description' => $validated['description'],
+            'author' => $user->username, // Use username as author
+            'genre' => $category->name, // Store category name in genre field
+            'content' => $validated['content'],
+            'is_community' => true, // User-created stories are community stories
+            'read_count' => 0,
+            'likes_count' => 0,
+            'comment_count' => 0,
+            'user_id' => $user->id,
+            'status' => 'pending',
+        ];
+
+        // Handle cover image upload
+        if ($request->hasFile('cover_image')) {
+            $path = $request->file('cover_image')->store('user_stories/cover_images', 'public');
+            $storyData['cover_image'] = $path;
+        }
+
+        if ($request->hasFile('backcover_image')) {
+            $path = $request->file('backcover_image')->store('user_stories/backcover_images', 'public');
+            $storyData['backcover_image'] = $path;
+        }
+
+        Story::create($storyData);
+
+        return redirect()->route('stories.category', ['category_slug' => $category->slug])
+            ->with('success', 'Story created successfully and will be visible after approval.');
+    }
+>>>>>>> live-main
 }

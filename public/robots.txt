@@ -1,2 +1,7 @@
 User-agent: *
 Disallow:
+<<<<<<< HEAD
+=======
+
+Sitemap: https://www.storievault.com/sitemap.xml
+>>>>>>> live-main

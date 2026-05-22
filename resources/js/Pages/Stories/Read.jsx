@@ -10,11 +10,22 @@ import { motion } from "framer-motion";
 import HTMLFlipBook from "react-pageflip";
 import Book from "../../Components/Book";
 import LikeButton from "@/Components/stories/LikeButton";
+<<<<<<< HEAD
 
 export default function Read({ story, paginatedContent, auth }) {
     const bookRef = useRef(null);
     const [currentPage, setCurrentPage] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
+=======
+import StarRating from "@/Components/stories/StarRating";
+
+export default function Read({ story, paginatedContent, auth, averageRating, userRating }) {
+    const bookRef = useRef(null);
+    const scrollContainerRef = useRef(null);
+    const [currentPage, setCurrentPage] = useState(0);
+    const [totalPages, setTotalPages] = useState(0);
+    const [isScrollable, setIsScrollable] = useState(false);
+>>>>>>> live-main
 
     // Use backend paginated content instead of frontend pagination
     const storyPages = paginatedContent || [];
@@ -30,6 +41,34 @@ export default function Read({ story, paginatedContent, auth }) {
         setTotalPages(total);
     }, [storyPages.length]);
 
+<<<<<<< HEAD
+=======
+    // Check if content is scrollable
+    useEffect(() => {
+        const checkScrollable = () => {
+            if (scrollContainerRef.current) {
+                const element = scrollContainerRef.current;
+                const hasScroll = element.scrollHeight > element.clientHeight;
+                setIsScrollable(hasScroll);
+            }
+        };
+
+        // Check initially
+        checkScrollable();
+
+        // Check after a short delay to ensure content is rendered
+        const timeoutId = setTimeout(checkScrollable, 100);
+
+        // Check on window resize
+        window.addEventListener('resize', checkScrollable);
+
+        return () => {
+            clearTimeout(timeoutId);
+            window.removeEventListener('resize', checkScrollable);
+        };
+    }, [storyPages]);
+
+>>>>>>> live-main
     const flipNext = () => {
         // Check if we can go to next page
         if (currentPage < totalPages - 1) {
@@ -206,7 +245,11 @@ export default function Read({ story, paginatedContent, auth }) {
                                 </div>
                             </div>
 
+<<<<<<< HEAD
                             {/* Reading Content with Flipbook */}
+=======
+                            {/* Reading Content with Scroll */}
+>>>>>>> live-main
                             {storyPages.length === 0 ? (
                                 <div className="text-center py-5">
                                     <div
@@ -222,9 +265,15 @@ export default function Read({ story, paginatedContent, auth }) {
                                     </p>
                                 </div>
                             ) : (
+<<<<<<< HEAD
                                 <Book
                                     ref={bookRef}
                                     pages={storyPages.map((page, index) => (
+=======
+                                <div className="book-wrapper-scroll" ref={scrollContainerRef}>
+                                    {/* Story Pages */}
+                                    {storyPages.map((page, index) => (
+>>>>>>> live-main
                                         <div
                                             key={index}
                                             className="page-content"
@@ -233,6 +282,7 @@ export default function Read({ story, paginatedContent, auth }) {
                                             }}
                                         />
                                     ))}
+<<<<<<< HEAD
                                     coverImage={
                                         story.cover_image
                                             ? `/storage/${story.cover_image}`
@@ -247,10 +297,14 @@ export default function Read({ story, paginatedContent, auth }) {
                                     onFlip={handleBookFlip}
                                     allowCloseAfterBackCover={story.allow_close_after_back_cover !== false}
                                 />
+=======
+                                </div>
+>>>>>>> live-main
                             )}
                             {/* <div className="story-raw-preview" dangerouslySetInnerHTML={{ __html: story.content }} /> */}
 
                             {/* Chapter Navigation */}
+<<<<<<< HEAD
                             <div className="chapter-navigation">
                                 <button
                                     className="btn btn-primary story-btn chapter-btn"
@@ -274,6 +328,15 @@ export default function Read({ story, paginatedContent, auth }) {
                                     <i className="fas fa-chevron-right ms-2"></i>
                                 </button>
                             </div>
+=======
+                            {storyPages.length > 1 && isScrollable && (
+                                <div className="chapter-navigation">
+                                    <div className="chapter-indicator secondry-font">
+                                        Scroll to read all pages
+                                    </div>
+                                </div>
+                            )}
+>>>>>>> live-main
 
                             {/* Reading Footer */}
                             <div className="reading-footer">
@@ -327,6 +390,16 @@ export default function Read({ story, paginatedContent, auth }) {
                                     storyId={story.id}
                                     currentUser={auth.user}
                                 />
+<<<<<<< HEAD
+=======
+
+                                {/* Rating Section */}
+                                <StarRating
+                                    storyId={story.id}
+                                    initialRating={userRating}
+                                    averageRating={averageRating}
+                                />
+>>>>>>> live-main
                             </div>
                         </div>
                     </div>

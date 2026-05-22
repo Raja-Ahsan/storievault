@@ -4,14 +4,22 @@ import { Icons } from '../utils/icons';
 const testimonials = [
   {
     id: 1,
+<<<<<<< HEAD
     image: "/assets/images/testi-img-01.png",
+=======
+    image: "/assets/images/testi-img-01.webp",
+>>>>>>> live-main
     name: "Eleanor Hart",
     designation: "Mystery Book Club President",
     description: "A chilling, atmospheric mystery that kept me guessing until the final page. 'Death At Fallow End' is a must-read for fans of classic British crime fiction.",
   },
   {
     id: 2,
+<<<<<<< HEAD
     image: "/assets/images/testi-img-02.png",
+=======
+    image: "/assets/images/testi-img-02.webp",
+>>>>>>> live-main
     name: "James Holloway",
     designation: "Author of The Ashcroft Files",
     description: "I couldn’t put it down. The setting is haunting, the characters are deeply layered, and the twists just keep coming.",
@@ -66,7 +74,11 @@ const Testimonials = () => {
                 <div className="testi-card">
                     <div className="d-flex align-items-center mb-10 gap-20">
                       <div>
+<<<<<<< HEAD
                         <img src={testimonial.image} alt="" />
+=======
+                        <img src={testimonial.image} alt={testimonial.name} />
+>>>>>>> live-main
                       </div>
                       <div>
                         <h3 className='fs-28 fw-700 secondry-font'>{testimonial.name},</h3>
@@ -76,7 +88,11 @@ const Testimonials = () => {
                     <p className='mb-20 fs-16'>
                       {testimonial.description}
                     </p>
+<<<<<<< HEAD
                     <img src="/assets/images/ratings.png" alt="" />
+=======
+                      <img src="/assets/images/ratings.webp" alt="ratings"/>
+>>>>>>> live-main
                   </div>
                 </div>
               ))}

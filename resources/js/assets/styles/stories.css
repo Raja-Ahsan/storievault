@@ -327,3 +327,59 @@
 .line-clamp-3 br {
   display: none;
 }
+<<<<<<< HEAD
+=======
+
+/* Category page content (admin-editable rich text) */
+/* .category-page-content h2,
+.category-page-content h3 {
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+  font-weight: 600;
+} */
+/* .category-page-content h2 { font-size: 1.5rem; }
+.category-page-content h3 { font-size: 1.25rem; }
+.category-page-content p {
+  margin-bottom: 1rem;
+  line-height: 1.6;
+} */
+/* .category-page-content ul,
+.category-page-content ol {
+  margin-bottom: 1rem;
+  padding-left: 1.5rem;
+} */
+/* .category-page-content li { margin-bottom: 0.25rem; }
+.category-page-content strong { font-weight: 600; } */
+
+/* Blog article HTML (matches story / category rich-text readability) */
+.blog-article-body h2 {
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  font-weight: 600;
+  font-size: clamp(1.35rem, 2.5vw, 1.75rem);
+  color: var(--light-black, #1a1a1a);
+}
+
+.blog-article-body h2:first-child {
+  margin-top: 0;
+}
+
+.blog-article-body p {
+  margin-bottom: 1rem;
+  line-height: 1.75;
+}
+
+.blog-article-body ul,
+.blog-article-body ol {
+  margin-bottom: 1.25rem;
+  padding-left: 1.5rem;
+}
+
+.blog-article-body li {
+  margin-bottom: 0.35rem;
+}
+
+.blog-article-body strong {
+  font-weight: 600;
+}
+>>>>>>> live-main

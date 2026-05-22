@@ -460,11 +460,19 @@ const Index = ({ communityStories, publishedStories, publishRequests, flash }) =
           <CCard className="mb-4">
             <CCardHeader className="d-flex justify-content-between align-items-center">
               <strong>My Stories</strong>
+<<<<<<< HEAD
               {/* <Link href={route('user-dashboard.stories.create')}>
                 <CButton className='custom-primary-btn' color="primary" size="sm" style={{ backgroundColor: '#fea257', borderColor: '#fea257' }}>
                   <Icons.Plus className="me-1" /> Create New Story
                 </CButton>
               </Link> */}
+=======
+              <Link href={route('user-dashboard.stories.create')}>
+                <CButton className='custom-primary-btn' color="primary" size="sm" style={{ backgroundColor: '#fea257', borderColor: '#fea257' }}>
+                  <Icons.Plus className="me-1" /> Create New Story
+                </CButton>
+              </Link>
+>>>>>>> live-main
             </CCardHeader>
             <CCardBody>
               <CNav variant="tabs" className="mb-4">

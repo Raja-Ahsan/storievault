@@ -40,6 +40,10 @@ class HomeController extends Controller
                 'title' => $story->title,
                 'author' => $story->author,
                 'cover_image' => $story->cover_image,
+<<<<<<< HEAD
+=======
+                'cover_image_url' => $story->cover_image_url,
+>>>>>>> live-main
                 'read_count' => $story->read_count,
                 'comment_count' => $story->comment_count,
                 'description' => $story->description,
@@ -52,6 +56,25 @@ class HomeController extends Controller
 
         return Inertia::render('Home', [
             'latestStories' => $formattedStories,
+<<<<<<< HEAD
+=======
+        ]);
+    }
+
+    /**
+     * Display the "From the Vault" page with featured stories.
+     */
+    public function fromTheVault()
+    {
+        $featuredStories = Story::where('is_community', true)
+            ->orderByRaw('
+                (read_count * 0.5) + (comment_count * 0.3) + (likes_count * 0.2) DESC
+            ')
+            ->take(5)
+            ->get();
+
+        return Inertia::render('FromTheVault', [
+>>>>>>> live-main
             'featuredStories' => $featuredStories,
         ]);
     }

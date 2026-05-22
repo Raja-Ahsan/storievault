@@ -7,6 +7,10 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import '../../js/assets/styles/utilities.css';
 import '../../js/assets/styles/style.css';
+<<<<<<< HEAD
+=======
+import '../../js/assets/styles/content-block.css';
+>>>>>>> live-main
 import Chatbot from '../Components/Chatbot';
 import UserWayWidget from '../Components/UserWayWidget';
 

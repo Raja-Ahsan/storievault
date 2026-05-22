@@ -146,7 +146,11 @@ const Home = () => {
           <div className="row align-items-center row-gap-40 flex-column flex-lg-row align-items-center text-center text-lg-start mx-auto mx-lg-0">
             <div className="col-lg-6" data-aos-duration="3000" data-aos="fade-right">
               <div className="circle position-relative mb-30 mx-auto mx-lg-0">
+<<<<<<< HEAD
                 <img src="/assets/images/logo.png" className="position-absolute start-0 end-0 mx-auto" alt="" />
+=======
+                <img src="/assets/images/logo.webp" className="position-absolute start-0 end-0 mx-auto" alt="" />
+>>>>>>> live-main
               </div>
               <span className="fs-32 light-black ls-8">Featured Story</span>
               <h2 className="heading mb-20">Death at <span className="">Fallow</span> End</h2>
@@ -190,7 +194,11 @@ const Home = () => {
             </div>
             <div className="col-lg-6 position-relative sec-3-right-area" data-aos-duration="3000" data-aos="fade-left">
               <div className="circle position-relative mb-30 mx-auto mx-lg-0">
+<<<<<<< HEAD
                 <img src="/assets/images/logo.png" className="position-absolute start-0 end-0 mx-auto" alt="" />
+=======
+                <img src="/assets/images/logo.webp" className="position-absolute start-0 end-0 mx-auto" alt="" />
+>>>>>>> live-main
               </div>
               <span className="fs-32 light-black ls-8">Featured Story</span>
               <h2 className="heading mb-20" style={{ lineHeight: '.8' }}>Death at Follow End <span className="fs-54">(Romantic Mystery)</span></h2>

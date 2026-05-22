@@ -37,7 +37,11 @@ const AppSidebar = ({ sidebarShow, setSidebarShow }) => {
     >
       <CSidebarHeader className="border-bottom">
         <CSidebarBrand href={user?.role === 'admin' ? '/admin-dashboard' : '/user-dashboard'}>
+<<<<<<< HEAD
           <img src="/assets/images/logo.png" alt="logo" className="sidebar-brand-full" style={{ maxWidth: '140px' }} />
+=======
+          <img src="/assets/images/logo.webp" alt="logo" className="sidebar-brand-full" style={{ maxWidth: '140px' }} />
+>>>>>>> live-main
           {/* <CIcon customClassName="sidebar-brand-narrow" icon={sygnet} height={32} /> */}
         </CSidebarBrand>
         <CCloseButton

@@ -1,6 +1,10 @@
 <?php
 
 use App\Http\Controllers\Admin\CouponController;
+<<<<<<< HEAD
+=======
+use App\Http\Controllers\SitemapController;
+>>>>>>> live-main
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\Auth\GoogleController;
@@ -16,6 +20,10 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\StoriesController;
 use App\Http\Controllers\StoryDraftsController;
 use App\Http\Controllers\StoryLikesController;
+<<<<<<< HEAD
+=======
+use App\Http\Controllers\StoryRatingsController;
+>>>>>>> live-main
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -32,8 +40,40 @@ use App\Http\Controllers\Admin\PackagesController as AdminPackagesController;
 use App\Http\Controllers\Admin\PublishPackageController as AdminPublishPackageController;
 use App\Http\Controllers\Admin\SubscriptionController as AdminSubscriptionController;
 use App\Http\Controllers\Admin\RatingController as AdminRatingController;
+<<<<<<< HEAD
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
+=======
+use App\Http\Controllers\Admin\BlogPostController;
+use App\Http\Controllers\Admin\BlogCategoryController;
+use App\Http\Controllers\Admin\BlogTagController;
+use App\Http\Controllers\BlogController;
+
+// SEO: sitemap and robots.txt (served by Laravel, not Inertia)
+Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
+Route::get('/robots.txt', function () {
+    $baseUrl = rtrim(config('app.url'), '/');
+    $sitemapUrl = (str_contains($baseUrl, 'localhost')) 
+        ? $baseUrl . '/sitemap.xml' 
+        : 'https://www.storievault.com/sitemap.xml';
+
+    $lines = [
+        'User-agent: *',
+        'Disallow:',
+        'Sitemap: ' . $sitemapUrl,
+    ];
+    return response(implode("\n", $lines), 200, [
+        'Content-Type' => 'text/plain; charset=UTF-8',
+        'Cache-Control' => 'public, max-age=86400',
+    ]);
+})->name('robots');
+
+Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/from-the-vault', [HomeController::class, 'fromTheVault'])->name('from-the-vault');
+
+Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
+Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('blog.show');
+>>>>>>> live-main
 // google auth 
 
 
@@ -63,8 +103,20 @@ Route::get('/logout-and-register', [GuestAuthController::class, 'logoutAndRegist
 
 // Stories routes
 Route::get('/stories', [StoriesController::class, 'index'])->name('stories.index');
+<<<<<<< HEAD
 Route::get('/stories/{story}', [StoriesController::class, 'show'])->name('stories.show');
 Route::get('/stories/{story}/read', [StoriesController::class, 'read'])->name('stories.read');
+=======
+Route::get('/{category_slug}-stories', [StoriesController::class, 'index'])
+    ->name('stories.category')
+    ->where('category_slug', '[a-z0-9\-]+');
+Route::get('/stories/{story}', [StoriesController::class, 'show'])->name('stories.show');
+Route::get('/stories/{story}/read', [StoriesController::class, 'read'])->name('stories.read');
+Route::middleware('auth')->group(function () {
+    Route::get('/create-story', [StoriesController::class, 'createStory'])->name('stories.create');
+    Route::post('/create-story', [StoriesController::class, 'storeStory'])->name('stories.store');
+});
+>>>>>>> live-main
 
 
 // Community routes
@@ -98,6 +150,15 @@ Route::middleware('auth')->group(function () {
     Route::post('/stories/{story}/likes', [StoryLikesController::class, 'toggleLike'])->name('likes.toggle');
 });
 
+<<<<<<< HEAD
+=======
+// Ratings routes
+Route::get('/stories/{story}/rating', [StoryRatingsController::class, 'getRating'])->name('ratings.get');
+Route::middleware('auth')->group(function () {
+    Route::post('/stories/{story}/rating', [StoryRatingsController::class, 'store'])->name('ratings.store');
+});
+
+>>>>>>> live-main
 // Drafts routes
 Route::middleware('auth')->group(function () {
     Route::get('/drafts', [StoryDraftsController::class, 'index'])->name('drafts.index');
@@ -170,6 +231,16 @@ Route::prefix('admin-dashboard')->name('admin-dashboard.')->middleware(['auth', 
     // Rating routes
     Route::resource('ratings', \App\Http\Controllers\Admin\AdminRatingController::class);
 
+<<<<<<< HEAD
+=======
+    // Category routes (story / SEO categories)
+    Route::resource('categories', \App\Http\Controllers\Admin\CategoryController::class);
+
+    Route::resource('blog-posts', BlogPostController::class);
+    Route::resource('blog-categories', BlogCategoryController::class)->except(['show']);
+    Route::resource('blog-tags', BlogTagController::class)->except(['show']);
+
+>>>>>>> live-main
 });
 
 Route::prefix('user-dashboard')->name('user-dashboard.')->middleware(['auth', 'user'])->group(function() {
@@ -186,6 +257,14 @@ Route::get('/about', function () {
     return Inertia::render('About');
 })->name('about');
 
+<<<<<<< HEAD
+=======
+Route::get('/custom-prompt-generator', function () {
+    return Inertia::render('CustomPromptGenerator');
+})->name('custom-prompt-generator');
+
+
+>>>>>>> live-main
 Route::get('/terms-and-conditions', function () {
     return Inertia::render('Terms');
 })->name('terms-and-conditions');
@@ -202,16 +281,46 @@ Route::get('/how-it-works', function () {
     return Inertia::render('HowItWorks');
 })->name('how-it-works');
 
+<<<<<<< HEAD
+=======
+Route::get('/contests', function () {
+    return Inertia::render('Contests');
+})->name('contests');
+
+Route::get('/create-contest', function () {
+    return Inertia::render('Contests/CreateContest');
+})->name('create-contest');
+
+Route::get('/monthly-fiction-contest', function () {
+    return Inertia::render('Contests/MonthlyFictionContest');
+})->name('monthly-fiction-contest');
+
+Route::get('/poetry-contest', function () {
+    return Inertia::render('Contests/PoetryContest');
+})->name('poetry-contest');
+
+>>>>>>> live-main
 Route::get('/faqs', function () {
     return Inertia::render('Faqs');
 })->name('faqs');
 
 Route::post('/chatgpt/send', [ChatbotController::class, 'send']);
+<<<<<<< HEAD
+=======
+Route::post('/custom-prompt-generator/generate', [ChatbotController::class, 'generatePrompt'])->name('custom-prompt-generator.generate');
+>>>>>>> live-main
 
 // new dashboard implementation
 Route::get('/dashboard-new', function () {
     return Inertia::render('admin/DashboardNew');
 })->name('dashboardNew');
 
+<<<<<<< HEAD
+=======
+// Wrong / unknown URLs → redirect to home instead of 404
+Route::fallback(function () {
+    return redirect()->route('home');
+});
+>>>>>>> live-main
 
 require __DIR__ . '/auth.php';

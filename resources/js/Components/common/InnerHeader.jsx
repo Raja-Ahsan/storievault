@@ -23,7 +23,11 @@ const InnerHeader = () => {
           <div className="col-lg-3 col-6">
             <div className="logo">
               <Link href="/">
+<<<<<<< HEAD
                 <img src="/assets/images/logo.png" alt="logo" style={{ maxWidth: '100px' }} />
+=======
+                <img src="/assets/images/logo.webp" alt="logo" style={{ maxWidth: '100px' }} />
+>>>>>>> live-main
               </Link>
             </div>
           </div>

@@ -96,6 +96,14 @@ const adminNav = [
         name: 'Community',
         to: '/admin-dashboard/community/stories',
       },
+<<<<<<< HEAD
+=======
+      {
+        component: CNavItem,
+        name: 'Categories',
+        to: '/admin-dashboard/categories',
+      },
+>>>>>>> live-main
     ],
   },
   {
@@ -177,6 +185,37 @@ const adminNav = [
       },
     ],
   },
+<<<<<<< HEAD
+=======
+  {
+    component: CNavGroup,
+    name: 'Blog',
+    to: '/admin-dashboard/blog-posts',
+    icon: <CIcon icon={cilNotes} customClassName="nav-icon" />,
+    items: [
+      {
+        component: CNavItem,
+        name: 'Posts',
+        to: '/admin-dashboard/blog-posts',
+      },
+      {
+        component: CNavItem,
+        name: 'New post',
+        to: '/admin-dashboard/blog-posts/create',
+      },
+      {
+        component: CNavItem,
+        name: 'Blog categories',
+        to: '/admin-dashboard/blog-categories',
+      },
+      {
+        component: CNavItem,
+        name: 'Blog tags',
+        to: '/admin-dashboard/blog-tags',
+      },
+    ],
+  },
+>>>>>>> live-main
 ]
 
 const userNav = [
@@ -198,6 +237,14 @@ const userNav = [
         name: 'List',
         to: '/user-dashboard/stories',
       },
+<<<<<<< HEAD
+=======
+      {
+        component: InertiaNavItem,
+        name: 'Create',
+        to: '/user-dashboard/stories/create',
+      },
+>>>>>>> live-main
     ],
   },
 

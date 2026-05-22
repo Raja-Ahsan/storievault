@@ -6,6 +6,10 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+<<<<<<< HEAD
+=======
+use Illuminate\Support\Facades\Storage;
+>>>>>>> live-main
 
 class Story extends Model
 {
@@ -96,6 +100,17 @@ class Story extends Model
     }
 
     /**
+<<<<<<< HEAD
+=======
+     * Get the ratings for the story.
+     */
+    public function storyRatings(): HasMany
+    {
+        return $this->hasMany(StoryRating::class);
+    }
+
+    /**
+>>>>>>> live-main
      * Get the users who liked the story.
      */
     public function likedBy(): BelongsToMany
@@ -136,7 +151,11 @@ class Story extends Model
         });
     }
 
+<<<<<<< HEAD
     protected $appends = ['created_at_formatted'];
+=======
+    protected $appends = ['created_at_formatted', 'cover_image_url', 'backcover_image_url'];
+>>>>>>> live-main
 
     public function getCreatedAtFormattedAttribute()
     {
@@ -175,4 +194,31 @@ class Story extends Model
         }
         return $query;
     }
+<<<<<<< HEAD
+=======
+
+    /**
+     * Get the URL for the cover image.
+     */
+    public function getCoverImageUrlAttribute()
+    {
+        if (!$this->cover_image) {
+            return null;
+        }
+        // Use relative URL to avoid APP_URL issues
+        return '/storage/' . $this->cover_image;
+    }
+
+    /**
+     * Get the URL for the back cover image.
+     */
+    public function getBackcoverImageUrlAttribute()
+    {
+        if (!$this->backcover_image) {
+            return null;
+        }
+        // Use relative URL to avoid APP_URL issues
+        return '/storage/' . $this->backcover_image;
+    }
+>>>>>>> live-main
 }

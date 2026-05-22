@@ -102,10 +102,13 @@ const Create = ({ flash }) => {
             newErrors.features = "At least one feature is required";
         }
 
+<<<<<<< HEAD
         if (!data.stripe_price_id || data.stripe_price_id.trim() === "") {
             newErrors.stripe_price_id = "Stripe Price ID is required";
         }
 
+=======
+>>>>>>> live-main
         return Object.keys(newErrors).length === 0;
     };
 
@@ -290,7 +293,11 @@ const Create = ({ flash }) => {
                                 </CRow>
 
                                 <CRow className="mb-3">
+<<<<<<< HEAD
                                     <CCol md={6}>
+=======
+                                    <CCol md={12}>
+>>>>>>> live-main
                                         <CFormLabel htmlFor="is_active">
                                             Status
                                         </CFormLabel>
@@ -315,6 +322,7 @@ const Create = ({ flash }) => {
                                             </div>
                                         )}
                                     </CCol>
+<<<<<<< HEAD
 
                                     <CCol md={6}>
                                         <CFormLabel htmlFor="stripe_price_id">
@@ -342,6 +350,8 @@ const Create = ({ flash }) => {
                                             </div>
                                         )}
                                     </CCol>
+=======
+>>>>>>> live-main
                                 </CRow>
 
                                 <CRow className="mb-3">

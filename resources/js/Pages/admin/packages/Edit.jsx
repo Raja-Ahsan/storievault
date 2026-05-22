@@ -124,10 +124,13 @@ const Edit = ({ package: pkg, flash }) => {
       newErrors.interval = 'Please select a valid interval';
     }
 
+<<<<<<< HEAD
     if (!data.stripe_price_id || data.stripe_price_id.trim() === '') {
       newErrors.stripe_price_id = 'Stripe Price ID is required';
     }
 
+=======
+>>>>>>> live-main
     if (!data.words_limit || isNaN(data.words_limit) || data.words_limit <= 0) {
       newErrors.words_limit = 'Valid words limit is required';
     }
@@ -295,9 +298,16 @@ const Edit = ({ package: pkg, flash }) => {
                         placeholder="10.30 for $10.30"
                         min="0"
                         step="0.01"
+<<<<<<< HEAD
                       />
                     </CInputGroup>
                     <small className="text-muted">Enter price in dollars (e.g., 10.30 for $10.30)</small>
+=======
+                        disabled={true}
+                      />
+                    </CInputGroup>
+                    <small className="text-muted">you can't change the price here</small>
+>>>>>>> live-main
                     {errors.price_cents && (
                       <div className="text-danger">{errors.price_cents}</div>
                     )}
@@ -314,6 +324,10 @@ const Edit = ({ package: pkg, flash }) => {
                       onChange={(e) => setData('interval', e.target.value)}
                       invalid={!!errors.interval}
                       options={intervalOptions}
+<<<<<<< HEAD
+=======
+                      disabled={true}
+>>>>>>> live-main
                     />
                     {errors.interval && (
                       <div className="text-danger">{errors.interval}</div>
@@ -338,6 +352,7 @@ const Edit = ({ package: pkg, flash }) => {
                 </CRow>
 
                 <CRow className="mb-3">
+<<<<<<< HEAD
                   <CCol md={6}>
                     <CFormLabel htmlFor="stripe_price_id">Stripe Price ID</CFormLabel>
                     <CFormInput
@@ -354,6 +369,9 @@ const Edit = ({ package: pkg, flash }) => {
                     {/* Removed validationErrors.stripe_price_id */}
                   </CCol>
                   <CCol md={6}>
+=======
+                  <CCol md={12}>
+>>>>>>> live-main
                     <CFormLabel htmlFor="badge">Badge</CFormLabel>
                     <CFormInput
                       id="badge"
@@ -369,12 +387,19 @@ const Edit = ({ package: pkg, flash }) => {
                     {/* Removed validationErrors.stripe_price_id */}
                   </CCol>
                 </CRow>
+<<<<<<< HEAD
                 <CRow className="mb-3">
+=======
+                {/* <CRow className="mb-3">
+>>>>>>> live-main
                   <CCol md={6}>
                     <CFormLabel htmlFor="name">
                       Words Limit
                     </CFormLabel>
+<<<<<<< HEAD
                     {/* add type number in words limit input */}
+=======
+>>>>>>> live-main
                     <CFormInput
                       id="words_limit"
                       type="number"
@@ -390,7 +415,10 @@ const Edit = ({ package: pkg, flash }) => {
                         {errors.words_limit}
                       </div>
                     )}
+<<<<<<< HEAD
                     {/* Removed validationErrors.words_limit */}
+=======
+>>>>>>> live-main
                   </CCol>
 
                   <CCol md={6}>
@@ -412,9 +440,14 @@ const Edit = ({ package: pkg, flash }) => {
                         {errors.stories_limit}
                       </div>
                     )}
+<<<<<<< HEAD
                     {/* Removed validationErrors.stories_limit */}
                   </CCol>
                 </CRow>
+=======
+                  </CCol>
+                </CRow> */}
+>>>>>>> live-main
                 <CRow className="mb-3">
                   <CCol md={12}>
                     <CFormLabel htmlFor="features">Features</CFormLabel>

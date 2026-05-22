@@ -1,5 +1,9 @@
 import React, { useState, useEffect } from 'react';
+<<<<<<< HEAD
 import { Head, useForm } from '@inertiajs/react';
+=======
+import { Head, useForm, usePage } from '@inertiajs/react';
+>>>>>>> live-main
 import DashboardLayout from '../../../Layouts/DashboardLayout';
 import Swal from 'sweetalert2';
 import {
@@ -14,11 +18,14 @@ import {
   CFormTextarea,
   CRow,
   CFormSelect,
+<<<<<<< HEAD
   CAlert,
   CListGroup,
   CListGroupItem,
   CInputGroup,
   CInputGroupText,
+=======
+>>>>>>> live-main
 } from '@coreui/react';
 import ReactQuill from 'react-quill-new';
 
@@ -28,6 +35,7 @@ const themeColors = {
   secondary: '#74989E',
 };
 
+<<<<<<< HEAD
 const Create = ({ flash, ratings = [] }) => {
   const { data, setData, post, processing, errors, reset } = useForm({
     title: '',
@@ -41,6 +49,20 @@ const Create = ({ flash, ratings = [] }) => {
   });
 
   const [newCharacter, setNewCharacter] = useState({ name: '', description: '' });
+=======
+const Create = ({ flash, categories = [] }) => {
+  const { auth } = usePage().props;
+  const { data, setData, post, processing, errors, reset } = useForm({
+    title: '',
+    description: '',
+    author: auth?.user?.username || '',
+    category: '',
+    content: '',
+    cover_image: null,
+    backcover_image: null,
+  });
+
+>>>>>>> live-main
   const [preview, setPreview] = useState({ cover_image: null, backcover_image: null });
   const [showHtml, setShowHtml] = useState(false);
 
@@ -114,8 +136,12 @@ const Create = ({ flash, ratings = [] }) => {
         if (errors.title) errorMessage = errors.title;
         else if (errors.description) errorMessage = errors.description;
         else if (errors.author) errorMessage = errors.author;
+<<<<<<< HEAD
         else if (errors.genre) errorMessage = errors.genre;
         else if (errors.rating) errorMessage = errors.rating;
+=======
+        else if (errors.category) errorMessage = errors.category;
+>>>>>>> live-main
         else if (errors.content) errorMessage = errors.content;
         else if (errors.cover_image) errorMessage = errors.cover_image;
         else if (errors.backcover_image) errorMessage = errors.backcover_image;
@@ -148,6 +174,7 @@ const Create = ({ flash, ratings = [] }) => {
     }
   };
 
+<<<<<<< HEAD
   const handleAddCharacter = () => {
     if (newCharacter.name.trim() === '') return;
     
@@ -171,6 +198,8 @@ const Create = ({ flash, ratings = [] }) => {
     { value: 'Horror', label: 'Horror' },
     { value: 'Historical Fiction', label: 'Historical Fiction' },
   ];
+=======
+>>>>>>> live-main
 
   return (
     <DashboardLayout>
@@ -201,16 +230,26 @@ const Create = ({ flash, ratings = [] }) => {
                     <CFormLabel htmlFor="author">Author</CFormLabel>
                     <CFormInput
                       id="author"
+<<<<<<< HEAD
                       value={data.author}
                       onChange={(e) => setData('author', e.target.value)}
                       invalid={errors.author}
                       feedback={errors.author}
                     />
                    
+=======
+                      value={auth?.user?.username || ''}
+                      disabled
+                      readOnly
+                      className="bg-light"
+                    />
+                    <div className="form-text">Author is automatically set to your username</div>
+>>>>>>> live-main
                   </CCol>
                 </CRow>
                 
                 <CRow className="mb-3">
+<<<<<<< HEAD
                   <CCol md={6}>
                     <CFormLabel htmlFor="genre">Genre</CFormLabel>
                     <CFormSelect
@@ -241,6 +280,24 @@ const Create = ({ flash, ratings = [] }) => {
                        ]}
                      />
                    
+=======
+                  <CCol md={12}>
+                    <CFormLabel htmlFor="category">Category</CFormLabel>
+                    <CFormSelect
+                      id="category"
+                      value={data.category}
+                      onChange={(e) => setData('category', e.target.value)}
+                      invalid={errors.category}
+                      feedback={errors.category}
+                      options={[
+                        { value: '', label: 'Select a category' },
+                        ...categories.map(category => ({
+                          value: category.id,
+                          label: category.name
+                        }))
+                      ]}
+                    />
+>>>>>>> live-main
                   </CCol>
                 </CRow>
                 
@@ -308,6 +365,7 @@ const Create = ({ flash, ratings = [] }) => {
 
                 <CRow className="mb-3">
                   <CCol md={12}>
+<<<<<<< HEAD
                     <CFormLabel>Story Characters</CFormLabel>
                     
                     <CInputGroup className="mb-3">
@@ -362,6 +420,8 @@ const Create = ({ flash, ratings = [] }) => {
                 
                 <CRow className="mb-3">
                   <CCol md={12}>
+=======
+>>>>>>> live-main
                     <div className="d-flex justify-content-between align-items-center mb-2">
                       <CFormLabel htmlFor="content">Story Content</CFormLabel>
                       <CButton

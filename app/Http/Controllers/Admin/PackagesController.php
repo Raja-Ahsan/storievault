@@ -6,9 +6,16 @@ use App\Http\Controllers\Controller;
 use App\Models\Package;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Stripe\Stripe;
+use Stripe\Product;
+use Stripe\Price;
+use Exception;
+
+
 
 class PackagesController extends Controller
 {
+    // auto generate packages in stripe 
     /**
      * Display a listing of the resource.
      */
@@ -40,23 +47,57 @@ class PackagesController extends Controller
             'stories_limit' => 'nullable|integer|min:0',
             'interval' => 'nullable|string|in:monthly,yearly',
             'features' => 'nullable|array',
-            'stripe_price_id' => 'required|string',
             'is_active' => 'boolean',
         ]);
-        
+
         // Ensure features is always an array
         if (isset($data['features'])) {
             $data['features'] = is_array($data['features']) ? $data['features'] : [];
         } else {
             $data['features'] = [];
         }
-        
+
         // Set default values
         $data['is_active'] = $data['is_active'] ?? true;
-        
-        Package::create($data);
-        return redirect()->route('admin-dashboard.packages.index')
-    ->with('success', 'Package created successfully.');
+
+        try {
+            Stripe::setApiKey(config('services.stripe.secret'));
+
+            // ⚡ Create Stripe Product
+            $product = Product::create([
+                'name' => $data['name'],
+                'description' => !empty($data['features'])
+                    ? implode(', ', $data['features'])
+                    : 'Subscription package for StoryVault.',
+            ]);
+
+            // ⚡ Create Stripe Price (if not free)
+            if (!empty($data['price_cents']) && $data['price_cents'] > 0) {
+                $interval = $data['interval'] ?? 'month';
+                $price = Price::create([
+                    'unit_amount' => $data['price_cents'],
+                    'currency' => 'usd',
+                    'recurring' => [
+                        'interval' => $interval === 'yearly' ? 'year' : 'month',
+                    ],
+                    'product' => $product->id,
+                ]);
+
+                $data['stripe_price_id'] = $price->id;
+            } else {
+                // Free package (no price)
+                $data['stripe_price_id'] = null;
+            }
+
+            // ⚡ Save locally
+            Package::create($data);
+
+            return redirect()
+                ->route('admin-dashboard.packages.index')
+                ->with('success', 'Package created successfully in Stripe and local database.');
+        } catch (Exception $e) {
+            return back()->with('error', 'Stripe error: ' . $e->getMessage());
+        }
     }
 
     /**
@@ -65,7 +106,11 @@ class PackagesController extends Controller
     public function show(string $id)
     {
         $package = Package::findOrFail($id);
+<<<<<<< HEAD
         
+=======
+
+>>>>>>> live-main
         return Inertia::render('admin/packages/Show', [
             'package' => $package
         ]);
@@ -77,7 +122,11 @@ class PackagesController extends Controller
     public function edit(string $id)
     {
         $package = Package::findOrFail($id);
+<<<<<<< HEAD
         
+=======
+
+>>>>>>> live-main
         return Inertia::render('admin/packages/Edit', [
             'package' => $package
         ]);
@@ -96,19 +145,63 @@ class PackagesController extends Controller
             'words_limit' => 'nullable|integer',
             'stories_limit' => 'nullable|integer',
             'features' => 'nullable|array',
+<<<<<<< HEAD
             'stripe_price_id' => 'required|string',
             'is_active' => 'nullable|boolean',
         ]);
         
+=======
+            'is_active' => 'nullable|boolean',
+        ]);
+
+>>>>>>> live-main
         // Ensure features is always an array
         if (isset($data['features'])) {
             $data['features'] = is_array($data['features']) ? $data['features'] : [];
         } else {
             $data['features'] = [];
         }
+<<<<<<< HEAD
         
         $package->update($data);
         return back()->with('success', 'Package updated successfully.');
+=======
+
+        try {
+            \Stripe\Stripe::setApiKey(config('services.stripe.secret'));
+
+            // 🔍 Step 1: Find the product linked to this package
+            if ($package->stripe_price_id) {
+                $oldPrice = \Stripe\Price::retrieve($package->stripe_price_id);
+                $productId = $oldPrice->product;
+
+                \Stripe\Product::update($productId, [
+                    'name' => $data['name'],
+                    'description' => implode(', ', $data['features'] ?? []),
+                ]);
+
+                if ($data['price_cents'] != $package->price_cents || $data['interval'] != $package->interval) {
+                    $interval = $data['interval'] ?? 'month';
+
+                    $newPrice = \Stripe\Price::create([
+                        'unit_amount' => $data['price_cents'],
+                        'currency' => 'usd',
+                        'recurring' => ['interval' => $interval === 'yearly' ? 'year' : 'month'],
+                        'product' => $productId,
+                    ]);
+
+                    $data['stripe_price_id'] = $newPrice->id;
+                }
+            }
+
+            // ⚡ Step 3: Update local DB
+            $package->update($data);
+
+            return back()->with('success', 'Package updated successfully in Stripe and local database.');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Stripe update failed: ' . $e->getMessage());
+        }
+>>>>>>> live-main
     }
 
     /**
@@ -116,7 +209,33 @@ class PackagesController extends Controller
      */
     public function destroy(Package $package)
     {
+<<<<<<< HEAD
         $package->delete();
         return back()->with('success', 'Package deleted successfully.');
+=======
+        try {
+            \Stripe\Stripe::setApiKey(config('services.stripe.secret'));
+
+            // ✅ Step 1: Find linked Stripe Product
+            if ($package->stripe_price_id) {
+                $price = \Stripe\Price::retrieve($package->stripe_price_id);
+                $productId = $price->product ?? null;
+
+                if ($productId) {
+                    // ⚡ Step 2: Archive (deactivate) the product in Stripe
+                    \Stripe\Product::update($productId, [
+                        'active' => false,
+                    ]);
+                }
+            }
+
+            // ✅ Step 3: Delete from local DB
+            $package->delete();
+
+            return back()->with('success', 'Package deleted locally and archived in Stripe.');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Stripe deletion failed: ' . $e->getMessage());
+        }
+>>>>>>> live-main
     }
 }

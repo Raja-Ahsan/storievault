@@ -11,12 +11,20 @@ import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createRoot } from 'react-dom/client';
 // Import HelmetProvider
 import { HelmetProvider } from 'react-helmet-async';
+<<<<<<< HEAD
 import LoaderWrapper from '@/Components/LoaderWrapper/Index';
+=======
+>>>>>>> live-main
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
 createInertiaApp({
+<<<<<<< HEAD
     title: (title) => `${title} - ${appName}`,
+=======
+    // Use page title as-is when set (e.g. "StoryVault | Save Memories"); otherwise fall back to app name
+    title: (title) => (title && title.trim() ? title : appName),
+>>>>>>> live-main
     resolve: (name) =>
         resolvePageComponent(
             `./Pages/${name}.jsx`,
@@ -31,10 +39,14 @@ createInertiaApp({
                 {/* Add Helmet component here for CDNs */}
                
 
+<<<<<<< HEAD
                 {/* Render the app */}
                 <LoaderWrapper>
                 <App {...props} />
                 </LoaderWrapper>
+=======
+                <App {...props} />
+>>>>>>> live-main
             </HelmetProvider>
         );
     },

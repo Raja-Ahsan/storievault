@@ -8,11 +8,19 @@ const Footer = () => {
           <div className="row justify-content-between row-gap-40">
             <div className="col-lg-2">
               <div className="logo mb-40">
+<<<<<<< HEAD
                 <img src="/assets/images/logo.png" alt="logo" />
               </div>
               <div className="footer-logos">
                 <img src="/assets/images/dmc-icon.png" alt="dmc" />
                 <img src="/assets/images/pci.png" alt="pci" />
+=======
+                <img src="/assets/images/logo.webp" alt="logo" />
+              </div>
+              <div className="footer-logos">
+                <img src="/assets/images/dmc-icon.webp" alt="dmc" />
+                <img src="/assets/images/pci.webp" alt="pci" />
+>>>>>>> live-main
               </div>
             </div>
             <div className="col-lg-2">
@@ -23,6 +31,10 @@ const Footer = () => {
                 <li><Link href="/community">Community</Link></li>
                 <li><Link href="/publish">Publish</Link></li>
                 <li><Link href="/about">About</Link></li>
+<<<<<<< HEAD
+=======
+                <li><Link href="/blog">Blog</Link></li>
+>>>>>>> live-main
               </ul>
             </div>
             <div className="col-lg-2">

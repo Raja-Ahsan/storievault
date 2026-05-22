@@ -97,7 +97,11 @@ const StoryOfTheMonth = () => {
             <div className="col-lg-4">
               <div className="story-month-right d-flex justify-content-center justify-content-lg-end">
                 {/* You may move image out of the map and show current story based on index if needed */}
+<<<<<<< HEAD
                 <img src={stories[0]?.image} alt={`story`} />
+=======
+                <img src={stories[0]?.image} alt={stories[0]?.title} />
+>>>>>>> live-main
               </div>
             </div>
           </div>
