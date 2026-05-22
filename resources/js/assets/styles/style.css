@@ -1885,6 +1885,17 @@ h6 {
 .stories-sec {
     padding-bottom: 50px !important;
 }
+.story-month-right-title {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 40px;
+    font-weight: 500;
+    color: #fff;
+    text-align: center;
+    width: 100%;
+}
 /* responsive */
 @media (min-width: 1560px) {
     .container {

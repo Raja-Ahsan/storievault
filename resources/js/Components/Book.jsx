@@ -1,6 +1,7 @@
 import React, { forwardRef } from "react";
 import HTMLFlipBook from "react-pageflip";
 import "../../css/book.css";
+import { DEFAULT_COVER_IMAGE, onCoverImageError } from "@/utils/imageFallback";
 
 
 const Book = forwardRef(({ pages = [], onInit, onFlip, coverImage, backcoverImage, allowCloseAfterBackCover = true }, bookRef) => {
@@ -9,7 +10,7 @@ const Book = forwardRef(({ pages = [], onInit, onFlip, coverImage, backcoverImag
         // Front Cover
         // add a background image instead of the image tag
         <div key="front-cover" className="book-cover front-cover">
-            <div className="cover-image" style={{ backgroundImage: `url(${coverImage || "/assets/images/default-cover.jpg"})`, backgroundSize: 'cover', }}></div>,
+            <div className="cover-image" style={{ backgroundImage: `url(${coverImage || DEFAULT_COVER_IMAGE})`, backgroundSize: 'cover', }}></div>,
         </div>,
 
         // Story Pages
@@ -22,9 +23,10 @@ const Book = forwardRef(({ pages = [], onInit, onFlip, coverImage, backcoverImag
         // Back Cover
         <div key="back-cover" className="book-cover back-cover">
             <img
-                src={backcoverImage || "/assets/images/default-cover.jpg"}
+                src={backcoverImage || DEFAULT_COVER_IMAGE}
                 alt="Back Cover"
                 className="cover-image"
+                onError={onCoverImageError}
             />
         </div>,
     ];

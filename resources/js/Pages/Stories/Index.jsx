@@ -5,6 +5,7 @@ import LikeCount from '@/Components/stories/LikeCount';
 import { debounce } from 'lodash';
 import Swal from 'sweetalert2';
 import '@/assets/styles/stories.css';
+import { DEFAULT_COVER_IMAGE, onCoverImageError } from '@/utils/imageFallback';
 
 const FAQ_ITEMS = [
   {
@@ -222,12 +223,10 @@ export default function Index({ stories, filters, flash, categoryPage = null }) 
                         </div>
                       )}
                       <img
-                        src={story.cover_image_url || (story.cover_image ? `/storage/${story.cover_image}` : '/assets/images/default-cover.jpg')}
+                        src={story.cover_image_url || (story.cover_image ? `/storage/${story.cover_image}` : DEFAULT_COVER_IMAGE)}
                         className="mb-20 w-100 story-book-img"
                         alt={story.title}
-                        onError={(e) => {
-                          e.target.src = '/assets/images/default-cover.jpg';
-                        }}
+                        onError={onCoverImageError}
                       />
                     </div>
                     <div className="d-flex align-items-center justify-content-between mb-10">

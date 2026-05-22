@@ -4,6 +4,7 @@ import Layout from '@/Layouts/Layout';
 import LikeCount from '@/Components/stories/LikeCount';
 import { debounce } from 'lodash';
 import '@/assets/styles/stories.css';
+import { DEFAULT_COVER_IMAGE, onCoverImageError } from '@/utils/imageFallback';
 
 export default function CommunityIndex({ stories, genres, filters, ratings }) {
   const [search, setSearch] = useState(filters.search || '');
@@ -117,15 +118,10 @@ export default function CommunityIndex({ stories, genres, filters, ratings }) {
                   <div className="cards" data-aos-duration="3000" data-aos="flip-left">
                     <div className="dynamic-cover-wrapper">
                     <img
-                      src={story.cover_image ? `/storage/${story.cover_image}` : '/assets/images/book-03.png'}
+                      src={story.cover_image_url || (story.cover_image ? `/storage/${story.cover_image}` : DEFAULT_COVER_IMAGE)}
                       className="mb-20 w-100 story-book-img"
                       alt={story.title}
-                      onError={(e) => {
-                        const fallbackImages = [
-                          "/assets/images/image-not-found.png",
-                        ];
-                        e.target.src = fallbackImages[Math.floor(Math.random() * fallbackImages.length)];
-                      }}
+                      onError={onCoverImageError}
                       />
                       </div>
                     <div className="d-flex align-items-center justify-content-between mb-10">

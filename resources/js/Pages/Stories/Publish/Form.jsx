@@ -6,6 +6,7 @@ import { Head, router, usePage } from '@inertiajs/react'
 import TextInput from '@/Components/TextInput';
 import Swal from 'sweetalert2';
 import { Icons } from '@/utils/icons';
+import { onCoverImageError } from '@/utils/imageFallback';
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_KEY);
 
@@ -408,7 +409,7 @@ const Form = ({ prefill, story, package: packageData, ratings = [] }) => {
                 <div className="col-md-12">
                   <div className="field-wrapper">
                     <label className='label-field d-block' htmlFor="title">Cover Image</label>
-                    <img src={story.cover_image ? `/storage/${story.cover_image}` : '/assets/images/default-cover.jpg'} alt="" className='img-fluid object-fit-cover' style={{ maxHeight: '100px' }} />
+                    <img src={story.cover_image ? `/storage/${story.cover_image}` : '/assets/images/image-not-available.jpg'} alt="" className='img-fluid object-fit-cover' style={{ maxHeight: '100px' }} onError={onCoverImageError} />
                   </div>
                   <div className="field-wrapper">
                     <label className='label-field' htmlFor="title">Title</label>

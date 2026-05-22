@@ -3,13 +3,6 @@ import Slider from "react-slick";
 import { Icons } from '../utils/icons';
 const stories = [
   {
-    title: "Death at Fallow End",
-    subtitle: "In the style of Martha Grimes",
-    description:
-      "The village of Fallow End never expected to make the papers. It was the sort of place that looked designed for biscuit tins: hedgerows blooming where no one planted them, honey-colored cottages with mossy slate roofs, and a high street so picturesque it was legally impossible to walk it without someone waving. The pub had beams older than the Queen’s English, and the bakery’s scones were the subject of regional debate.",
-    image: "/assets/images/story-month-right-01.png",
-  },
-  {
     title: "The Fog at Willow Moor",
     subtitle: "In the style of Agatha Christie",
     description:
@@ -35,7 +28,7 @@ const NextArrow = ({ onClick }) => (
 const StoryOfTheMonth = () => {
   const sliderRef = useRef(null);
   const settings = {
-    dots: true,
+    dots: false,
     arrows: false,
     fade: true,
     infinite: true,
@@ -69,14 +62,14 @@ const StoryOfTheMonth = () => {
             {/* Left Column with Text & Arrows */}
             <div className="col-lg-6 position-relative">
               {/* Arrows Positioned Inside the Column */}
-              <div className="story-month-custom-arrows d-flex gap-3 mb-4" style={{ top: 0, right: 0 }}>
+              {/* <div className="story-month-custom-arrows d-flex gap-3 mb-4" style={{ top: 0, right: 0 }}>
                 <div className="prev-arrow" onClick={() => sliderRef.current.slickPrev()}>
                   <Icons.ArrowLeft className="text-white fs-30" />
                 </div>
                 <div className="next-arrow" onClick={() => sliderRef.current.slickNext()}>
                   <Icons.ArrowRight className="text-white fs-30" />
                 </div>
-              </div>
+              </div> */}
 
               <Slider ref={sliderRef} {...settings}>
                 {stories.map((story, index) => (

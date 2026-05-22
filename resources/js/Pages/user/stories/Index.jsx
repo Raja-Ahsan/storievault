@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { Head, router, Link } from '@inertiajs/react'
 import DashboardLayout from '../../../Layouts/DashboardLayout';
 import { Icons } from '../../../utils/icons';
+import { DEFAULT_COVER_IMAGE, onCoverImageError } from '@/utils/imageFallback';
 import Swal from 'sweetalert2';
 import {
   CButton,
@@ -170,14 +171,13 @@ const Index = ({ communityStories, publishedStories, publishRequests, flash }) =
                 alt={story.title}
                 className="me-3"
                 style={{ width: '50px', height: '50px', objectFit: 'cover', borderRadius: '8px' }}
-                onError={(e) => {
-                  e.target.src = '/assets/images/book-03.png';
-                }}
+                onError={onCoverImageError}
               />
             ) : (
               <img
-                src="/assets/images/book-03.png"
+                src={DEFAULT_COVER_IMAGE}
                 alt="Default cover"
+                onError={onCoverImageError}
                 className="me-3"
                 style={{ width: '50px', height: '50px', objectFit: 'cover', borderRadius: '8px' }}
               />

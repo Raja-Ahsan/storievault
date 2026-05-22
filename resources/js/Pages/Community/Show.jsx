@@ -7,6 +7,7 @@ import '@/assets/styles/stories.css';
 import '@/assets/styles/story-read.css';
 import '@/assets/styles/comments.css';
 import LikeCount from '@/Components/stories/LikeCount';
+import { DEFAULT_COVER_IMAGE, onCoverImageError } from '@/utils/imageFallback';
 
 
 export default function CommunityShow({ story }) {
@@ -49,12 +50,10 @@ export default function CommunityShow({ story }) {
                 <div className="row">
                   <div className="col-md-4 mb-4 mb-md-0">
                     <img
-                      src={story.cover_image ? `/storage/${story.cover_image}` : '/assets/images/book-03.png'}
+                      src={story.cover_image_url || (story.cover_image ? `/storage/${story.cover_image}` : DEFAULT_COVER_IMAGE)}
                       alt={story.title}
                       className="img-fluid w-100 rounded-3 mb-3"
-                      onError={(e) => {
-                        e.target.src = "/assets/images/book-03.png";
-                      }}
+                      onError={onCoverImageError}
                     />
                     <div className="d-flex justify-content-between align-items-center mb-3">
                       <span className="fs-14 secondry-font">

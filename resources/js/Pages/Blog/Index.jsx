@@ -3,7 +3,7 @@ import Layout from '@/Layouts/Layout';
 import { Head, Link } from '@inertiajs/react';
 import '@/assets/styles/stories.css';
 
-const DEFAULT_COVER = '/assets/images/default-cover.jpg';
+import { DEFAULT_COVER_IMAGE, onCoverImageError } from '@/utils/imageFallback';
 
 const Index = ({ posts }) => {
   return (
@@ -57,12 +57,10 @@ const Index = ({ posts }) => {
                       )}
                       <Link href={route('blog.show', post.slug)} className="d-block text-black">
                         <img
-                          src={post.featured_image || DEFAULT_COVER}
+                          src={post.featured_image || DEFAULT_COVER_IMAGE}
                           className="mb-20 w-100 story-book-img"
                           alt=""
-                          onError={(e) => {
-                            e.target.src = DEFAULT_COVER;
-                          }}
+                          onError={onCoverImageError}
                         />
                       </Link>
                     </div>
