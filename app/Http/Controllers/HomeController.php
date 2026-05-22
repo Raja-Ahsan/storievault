@@ -40,6 +40,7 @@ class HomeController extends Controller
                 'title' => $story->title,
                 'author' => $story->author,
                 'cover_image' => $story->cover_image,
+                'cover_image_url' => $story->cover_image_url,
                 'read_count' => $story->read_count,
                 'comment_count' => $story->comment_count,
                 'description' => $story->description,

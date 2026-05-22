@@ -7,14 +7,14 @@ const stories = [
     subtitle: "In the style of Martha Grimes",
     description:
       "The village of Fallow End never expected to make the papers. It was the sort of place that looked designed for biscuit tins: hedgerows blooming where no one planted them, honey-colored cottages with mossy slate roofs, and a high street so picturesque it was legally impossible to walk it without someone waving. The pub had beams older than the Queen’s English, and the bakery’s scones were the subject of regional debate.",
-    image: "/assets/images/story-month-right-01.webp",
+    image: "/assets/images/story-month-right-01.png",
   },
   {
     title: "The Fog at Willow Moor",
     subtitle: "In the style of Agatha Christie",
     description:
       "The village of Fallow End never expected to make the papers. It was the sort of place that looked designed for biscuit tins: hedgerows blooming where no one planted them, honey-colored cottages with mossy slate roofs, and a high street so picturesque it was legally impossible to walk it without someone waving. The pub had beams older than the Queen’s English, and the bakery’s scones were the subject of regional debate.",
-    image: "/assets/images/story-month-right-01.webp",
+    image: "/assets/images/story-month-right-01.png",
   },
 ];
 

@@ -704,8 +704,8 @@ class StoriesController extends Controller
             'description' => 'required|string',
             'category' => 'required|exists:categories,id',
             'content' => 'required|string',
-            'cover_image' => 'required|image|max:2048', // Max 2MB
-            'backcover_image' => 'required|image|max:2048', // Max 2MB
+            'cover_image' => 'required|image',
+            'backcover_image' => 'required|image',
         ]);
 
         // Get category name from category ID

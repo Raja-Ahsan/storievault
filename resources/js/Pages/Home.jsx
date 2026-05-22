@@ -11,7 +11,7 @@ import Book004 from '@/assets/images/Book-004.webp'
 
 const Home = () => {
   // home page
-  const { auth, latestStories } = usePage().props;
+  const { auth } = usePage().props;
 
 
   return (
@@ -61,45 +61,48 @@ const Home = () => {
       </section>
       <section className='collection-sec'>
         <div className="container">
-          <h2 className='hd-md fw-500 mb-70 uppercase text-center'>Top Featured Stories</h2>
+          <h2 className='hd-md fw-500 mb-70 uppercase text-center'>Top Featured Genres</h2>
           <div className="row justify-content-center row-gap-40">
-            {latestStories && latestStories.slice(0, 3).map((story, index) => (
-              <div key={story.id} className="col-12 col-lg-4 col-xl-4">
-                <div className="collection-card d-flex justify-content-center align-items-center gap-20" >
-                  <div className="collection-card-img" >
-                    <img
-                      src={story.cover_image ? `/storage/${story.cover_image}` : `/assets/images/collection-0${index + 1}.png`}
-                      alt={story.title}
-                    />
-                  </div>
-                  <div className='collection-card-content'>
-                    <h4 className='text-30-bold mb-10' style={{ maxWidth: "195px" }}>{story.title}</h4>
-                    {/* {story.author && (
-                      <span className="text-primary secondary-font text-20">{story.author}</span>
-                    )} */}
-                    <p className='text-black secondary-font mb-20 mt-10'>
-                      {story.read_count === 0
-                        ? 'No one has read this story'
-                        : story.read_count === 1
-                          ? '1 person has read this story'
-                          : `${story.read_count} people have read this story`}
-                    </p>
-                    {/* {story.genre && (
-                      <div className="mb-3">
-                        <span className="label bg-secondry-theme text-white fs-16 py-10 px-20 radius-60 d-inline-block">
-                          {story.genre}
-                        </span>
-                      </div>
-                    )} */}
-                    <Link href={`/stories/${story.id}`} className='btn btn-primary text-white'>Story Detail</Link>
-                  </div>
+            <div className="col-12 col-lg-4 col-xl-4">
+              <div className="collection-card d-flex justify-content-center align-items-center gap-20">
+                <div className="collection-card-img">
+                  <img src="/assets/images/fantasy.webp" alt="FANTASY" />
+                </div>
+                <div className="collection-card-content">
+                  <h4 className="text-30-bold mb-10" style={{ maxWidth: "195px" }}>FANTASY</h4>
+                  <p className="text-black secondary-font mb-20 mt-10"></p>
+                  <Link href="/fantasy-stories" className="btn btn-primary text-white">View All</Link>
                 </div>
               </div>
-            ))}
+            </div>
+            <div className="col-12 col-lg-4 col-xl-4">
+              <div className="collection-card d-flex justify-content-center align-items-center gap-20">
+                <div className="collection-card-img">
+                  <img src="/assets/images/fanfiction.webp" alt="FANFICTION" />
+                </div>
+                <div className="collection-card-content">
+                  <h4 className="text-30-bold mb-10" style={{ maxWidth: "195px" }}>FANFICTION</h4>
+                  <p className="text-black secondary-font mb-20 mt-10"></p>
+                  <Link href="/fan-fiction-stories" className="btn btn-primary text-white">View All</Link>
+                </div>
+              </div>
+            </div>
+            <div className="col-12 col-lg-4 col-xl-4">
+              <div className="collection-card d-flex justify-content-center align-items-center gap-20">
+                <div className="collection-card-img">
+                  <img src="/assets/images/sci-fi.webp" alt="SCI-FI" />
+                </div>
+                <div className="collection-card-content">
+                  <h4 className="text-30-bold mb-10" style={{ maxWidth: "195px" }}>SCI-FI</h4>
+                  <p className="text-black secondary-font mb-20 mt-10"></p>
+                  <Link href="/sci-fi-stories" className="btn btn-primary text-white">View All</Link>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
-      <section className="signin-bg position-relative">
+      {/* <section className="signin-bg position-relative">
         <div className="container">
           <img src="/assets/images/signin-book.webp" alt="signin-book" className='signin-book position-absolute' />
           <img src="/assets/images/signin-right.webp" alt="signin-right" className='signin-right position-absolute bottom-0 end-0' />
@@ -141,15 +144,11 @@ const Home = () => {
                   <Link href="/stories" className="btn btn-secondary">Read A Sample</Link>
                 )}
               </div>
-              {/* <div className="d-flex gap-20 justify-content-center justify-content-lg-start">
-                <Button className="btn btn-primary">Sign In</Button>
-                <Button className="btn btn-secondary">Read A Sample</Button>
-              </div> */}
             </div>
           </div>
         </div>
-      </section>
-      <section className='collection-sec'>
+      </section> */}
+      {/* <section className='collection-sec'>
         <div className="container">
           <h2 className='hd-md fw-500 mb-70 uppercase text-center'>Our Collection</h2>
           <div className="row justify-content-center row-gap-40">
@@ -158,15 +157,12 @@ const Home = () => {
                 <div className="collection-card d-flex justify-content-center align-items-center gap-20" >
                   <div className="collection-card-img" >
                     <img
-                      src={story.cover_image ? `/storage/${story.cover_image}` : `/assets/images/collection-0${index + 1}.png`}
+                      src={story.cover_image_url || `/assets/images/collection-0${index + 1}.png`}
                       alt={story.title}
                     />
                   </div>
                   <div className='collection-card-content'>
                     <h4 className='text-30-bold mb-10' style={{ maxWidth: "195px" }}>{story.title}</h4>
-                    {/* {story.author && (
-                      <span className="text-primary secondary-font text-20">{story.author}</span>
-                    )} */}
                     <p className='text-black secondary-font mb-20 mt-10'>
                       {story.read_count === 0
                         ? 'No one has read this story'
@@ -174,13 +170,6 @@ const Home = () => {
                           ? '1 person has read this story'
                           : `${story.read_count} people have read this story`}
                     </p>
-                    {/* {story.genre && (
-                      <div className="mb-3">
-                        <span className="label bg-secondry-theme text-white fs-16 py-10 px-20 radius-60 d-inline-block">
-                          {story.genre}
-                        </span>
-                      </div>
-                    )} */}
                     <Link href={`/stories/${story.id}`} className='btn btn-primary text-white'>Story Detail</Link>
                   </div>
                 </div>
@@ -188,7 +177,7 @@ const Home = () => {
             ))}
           </div>
         </div>
-      </section>
+      </section> */}
       <StoryOfTheMonth />
       <Testimonials />
     </Layout>

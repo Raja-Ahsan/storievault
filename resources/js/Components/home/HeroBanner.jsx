@@ -5,21 +5,21 @@ const heroSlides = [
     {
         title: "Where Every Story Leaves a Mark",
         description: "Join our creative community. Explore, interact, and create your own version of timeless tales.",
-        imageCard1: "/assets/images/banner-card-01.webp",
+        imageCard1: "/assets/images/banner-left-01.png",
         imageCard2: "/assets/images/banner-card-02.webp",
         imageCard3: "/assets/images/banner-card-03.webp",
     },
     {
         title: "Unleash Your Creativity",
         description: "Embrace your imagination and craft stories that resonate for generations to come.",
-        imageCard1: "/assets/images/banner-card-01.webp",
+        imageCard1: "/assets/images/banner-left-01.png",
         imageCard2: "/assets/images/banner-card-02.webp",
         imageCard3: "/assets/images/banner-card-03.webp",
     },
     {
         title: "Craft Your Story, in Your own Way",
         description: "Dive into a world of possibilities. Share your unique narrative with the world and leave your mark.",
-        imageCard1: "/assets/images/banner-card-01.webp",
+        imageCard1: "/assets/images/banner-left-01.png",
         imageCard2: "/assets/images/banner-card-02.webp",
         imageCard3: "/assets/images/banner-card-03.webp",
     },
@@ -34,8 +34,8 @@ const HeroBanner = () => {
         speed: 600,
         slidesToShow: 1,
         slidesToScroll: 1,
-        autoplay: false,
-        autoplaySpeed: 2000,
+        autoplay: true,
+        autoplaySpeed: 4000,
         pauseOnHover: false,
         pauseOnFocus: false,
         pauseOnDotsHover: false,
@@ -78,7 +78,7 @@ const HeroBanner = () => {
                                 <div className="d-flex align-items-center justify-content-center position-relative">
                                     <div className="image-center-container image-container position-relative z-1">
                                         <div className="image-left-container position-absolute image-container-xxl">
-                                            <img src={heroSlide.imageCard1} alt="banner-image" />
+                                            <img src={heroSlide.imageCard1} alt="banner-image" className='hero-banner-left-img' />
                                         </div>
                                         <img src={heroSlide.imageCard2} className='hero-banner-center-img' alt="banner-image" />
                                         <div className="image-right-container position-absolute image-container-xxl">

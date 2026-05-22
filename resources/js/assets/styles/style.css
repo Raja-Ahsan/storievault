@@ -1877,6 +1877,14 @@ h6 {
 .logo img {
     max-width: 150px !important;
 }
+.hero-banner-left-img {
+    max-width: 383px;
+    border-radius: 20px;
+    transform: rotate(-9deg);
+}
+.stories-sec {
+    padding-bottom: 50px !important;
+}
 /* responsive */
 @media (min-width: 1560px) {
     .container {

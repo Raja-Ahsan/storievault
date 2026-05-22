@@ -48,8 +48,8 @@ const Edit = ({ story, flash, ratings = [] }) => {
   // Add state for new character input
   const [newCharacter, setNewCharacter] = useState({ name: '', description: '' });
   const [preview, setPreview] = useState({
-    cover_image: story?.cover_image ? `/storage/${story.cover_image}` : null,
-    backcover_image: story?.backcover_image ? `/storage/${story.backcover_image}` : null,
+    cover_image: story?.cover_image_url || null,
+    backcover_image: story?.backcover_image_url || null,
   });
   const [showHtml, setShowHtml] = useState(false);
 
@@ -99,6 +99,7 @@ const Edit = ({ story, flash, ratings = [] }) => {
     });
 
     post(route('admin-dashboard.stories.update', story.id), {
+      forceFormData: true,
       preserveScroll: true,
       onSuccess: () => {
         Swal.fire({

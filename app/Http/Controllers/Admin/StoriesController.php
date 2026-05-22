@@ -211,11 +211,17 @@ class StoriesController extends Controller
 
         // Handle cover image upload
         if ($request->hasFile('cover_image')) {
-            $path = $request->file('cover_image')->store('cover_images', 'public');
+            if ($story->cover_image) {
+                Storage::disk('public')->delete($story->cover_image);
+            }
+            $path = $request->file('cover_image')->store('admin_stories/cover_images', 'public');
             $storyData['cover_image'] = $path;
         }
 
         if ($request->hasFile('backcover_image')) {
+            if ($story->backcover_image) {
+                Storage::disk('public')->delete($story->backcover_image);
+            }
             $path = $request->file('backcover_image')->store('admin_stories/backcover_images', 'public');
             $storyData['backcover_image'] = $path;
         }

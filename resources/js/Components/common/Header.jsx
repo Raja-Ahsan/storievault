@@ -121,11 +121,11 @@ const Header = ({ logoClass, headerClass }) => {
                                         )}
                                     </ul>
                                 </li>
-                                <li>
+                                {/* <li>
                                     <Link href="/from-the-vault">
                                         From the Vault
                                     </Link>
-                                </li>
+                                </li> */}
                                 <li>
                                     <Link href="/packages">Packages</Link>
                                 </li>
