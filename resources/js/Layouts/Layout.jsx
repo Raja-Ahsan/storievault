@@ -10,6 +10,7 @@ import '../../js/assets/styles/style.css';
 import '../../js/assets/styles/content-block.css';
 import Chatbot from '../Components/Chatbot';
 import UserWayWidget from '../Components/UserWayWidget';
+import { Head, usePage } from '@inertiajs/react';
 
 
 export default function Layout({ children, headerClass, mainClass }) {
@@ -30,8 +31,14 @@ export default function Layout({ children, headerClass, mainClass }) {
     });
   }, []);
 
+  const { url } = usePage();
+  const appUrl = (import.meta.env.APP_URL || '').replace(/\/$/, '');
+
   return (
     <>
+     <Head>
+        <link rel="canonical" href={`${appUrl}${url}`} />
+      </Head>
       <Header headerClass={headerClass} />
       <main className={`${mainClass} web-main`}>{children}</main>
       <Chatbot />

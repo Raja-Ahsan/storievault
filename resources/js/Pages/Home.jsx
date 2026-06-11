@@ -12,12 +12,14 @@ import Book004 from '@/assets/images/Book-004.webp'
 const Home = () => {
   // home page
   const { auth } = usePage().props;
+  const { url } = usePage();
 
 
   return (
     <Layout headerClass="pt-30 home-page-wrapper" mainClass="home-page-wrapper">
       <Head title="StoryVault | Save Memories & Share Your Story">
         <meta name="description" content="Join StoryVault to save, share & explore personal stories and memories from around the world — a growing archive of human history for families, students & future generations." />
+        <link rel="canonical" href={`https://storievault.com${url}`} />
       </Head>
       <HeroBanner />
       <section className='most-popular-genres-sec pt-100 sec-bg' style={{ paddingBottom: '200px' }}>
