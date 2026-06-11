@@ -32,12 +32,17 @@ export default function Layout({ children, headerClass, mainClass }) {
   }, []);
 
   const { url } = usePage();
-  const appUrl = (import.meta.env.APP_URL || '').replace(/\/$/, '');
+const { appUrl } = usePage().props;
+const baseUrl = (appUrl || '').replace(/\/$/, '');
 
   return (
     <>
      <Head>
-        <link rel="canonical" href={`${appUrl}${url}`} />
+     <link
+    rel="canonical"
+    href={`${baseUrl}${url}`}
+    head-key="canonical"
+  />
       </Head>
       <Header headerClass={headerClass} />
       <main className={`${mainClass} web-main`}>{children}</main>

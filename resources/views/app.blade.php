@@ -10,7 +10,6 @@
         <title inertia>StoriVault</title>
 
         <!-- Canonical Link -->
-        <link rel="canonical" href="" />
 
         <!-- Google Analytics (gtag.js) -->
         <script async src="https://www.googletagmanager.com/gtag/js?id=G-PJW3ZTKPGD"></script>

@@ -29,9 +29,10 @@ class AppServiceProvider extends ServiceProvider
 
         Vite::prefetch(concurrency: 3);
         Inertia::share([
+            'appUrl' => env('APP_URL'),
             'today' => Carbon::now()->format('F j, Y'),
             'auth' => function () {
-                $user = auth()->user();
+                $user = auth()->user(); 
     
                 return [
                     'user' => $user,
