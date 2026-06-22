@@ -382,7 +382,12 @@ const CustomPromptGenerator = () => {
 
     return (
         <Layout headerClass="inner-header">
-            <Head title="Custom Prompt Generator" />
+            <Head title="Custom Prompt Generator for Story Writers & Creators | StorieVault">
+                <meta
+                    name="description"
+                    content="Create unique story ideas, character concepts, plot twists, and writing prompts with StorieVault's Custom Prompt Generator. Designed for writers, storytellers, and creative minds."
+                />
+            </Head>
             <main className="prompt-gen-wrapper">
                 <section className="pt-200 pb-100">
                     <div className="container">
