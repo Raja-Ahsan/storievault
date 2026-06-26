@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\BlogCategory;
 use App\Models\BlogTag;
 use App\Models\Post;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 
 class BlogPostController extends Controller
@@ -53,6 +55,7 @@ class BlogPostController extends Controller
 
         $validated = $request->validate([
             'title' => 'required|string|max:255',
+            'slug' => 'nullable|string|max:255|unique:posts,slug',
             'content' => 'required|string',
             'excerpt' => 'nullable|string',
             'meta_title' => 'nullable|string|max:255',
@@ -65,6 +68,7 @@ class BlogPostController extends Controller
             'visibility' => 'required|in:public,private',
             'status' => 'required|in:draft,published',
             'scheduled_publish_at' => 'nullable|date',
+            'scheduled_timezone' => 'nullable|string|max:64',
             'faqs' => 'nullable|json',
             'image' => 'nullable|image|max:5120',
             'blog_category_ids' => 'nullable|array',
@@ -77,6 +81,7 @@ class BlogPostController extends Controller
 
         $post = Post::create([
             'title' => $validated['title'],
+            'slug' => $this->resolvePostSlug($validated['slug'] ?? null, $validated['title']),
             'content' => $validated['content'],
             'excerpt' => $validated['excerpt'] ?? null,
             'meta_title' => $validated['meta_title'] ?? null,
@@ -88,7 +93,10 @@ class BlogPostController extends Controller
             'featured' => $request->boolean('featured'),
             'visibility' => $validated['visibility'],
             'status' => $validated['status'],
-            'scheduled_publish_at' => $validated['scheduled_publish_at'] ?? null,
+            'scheduled_publish_at' => $this->parseScheduledFromForm(
+                $validated['scheduled_publish_at'] ?? null,
+                $validated['scheduled_timezone'] ?? null
+            ),
             'faqs' => $faqs,
             'image' => null,
         ]);
@@ -144,6 +152,7 @@ class BlogPostController extends Controller
 
         $validated = $request->validate([
             'title' => 'required|string|max:255',
+            'slug' => 'nullable|string|max:255|unique:posts,slug,' . $blog_post->id,
             'content' => 'required|string',
             'excerpt' => 'nullable|string',
             'meta_title' => 'nullable|string|max:255',
@@ -156,6 +165,7 @@ class BlogPostController extends Controller
             'visibility' => 'required|in:public,private',
             'status' => 'required|in:draft,published',
             'scheduled_publish_at' => 'nullable|date',
+            'scheduled_timezone' => 'nullable|string|max:64',
             'faqs' => 'nullable|json',
             'image' => 'nullable|image|max:5120',
             'remove_image' => 'sometimes|boolean',
@@ -169,6 +179,7 @@ class BlogPostController extends Controller
 
         $blog_post->update([
             'title' => $validated['title'],
+            'slug' => $this->resolvePostSlug($validated['slug'] ?? null, $validated['title'], $blog_post->id),
             'content' => $validated['content'],
             'excerpt' => $validated['excerpt'] ?? null,
             'meta_title' => $validated['meta_title'] ?? null,
@@ -180,7 +191,10 @@ class BlogPostController extends Controller
             'featured' => $request->boolean('featured'),
             'visibility' => $validated['visibility'],
             'status' => $validated['status'],
-            'scheduled_publish_at' => $validated['scheduled_publish_at'] ?? null,
+            'scheduled_publish_at' => $this->parseScheduledFromForm(
+                $validated['scheduled_publish_at'] ?? null,
+                $validated['scheduled_timezone'] ?? null
+            ),
             'faqs' => $faqs,
         ]);
 
@@ -214,9 +228,33 @@ class BlogPostController extends Controller
 
     private function prepareScheduleInput(Request $request): void
     {
-        if ($request->input('scheduled_publish_at') === '' || $request->input('scheduled_publish_at') === null) {
+        $value = $request->input('scheduled_publish_at');
+
+        if ($value === null || $value === '' || (is_string($value) && trim($value) === '')) {
             $request->merge(['scheduled_publish_at' => null]);
         }
+    }
+
+    /**
+     * Parse schedule datetime from browser (ISO UTC) or legacy datetime-local string.
+     */
+    private function parseScheduledFromForm(?string $value, ?string $timezone = null): ?Carbon
+    {
+        if ($value === null || trim($value) === '') {
+            return null;
+        }
+
+        $value = trim($value);
+
+        if (preg_match('/[zZ]$/', $value) || preg_match('/[+-]\d{2}:?\d{2}$/', $value)) {
+            return Carbon::parse($value)->utc();
+        }
+
+        $tz = $timezone && in_array($timezone, timezone_identifiers_list(), true)
+            ? $timezone
+            : config('app.timezone');
+
+        return Carbon::parse($value, $tz)->utc();
     }
 
     private function sanitizeFaqsFromValidated(?string $json): array
@@ -245,5 +283,26 @@ class BlogPostController extends Controller
 
             return ($q !== '' && $a !== '') ? ['question' => $q, 'answer' => $a] : null;
         }, $faqs)));
+    }
+
+    private function resolvePostSlug(?string $slug, string $title, ?int $exceptId = null): string
+    {
+        $base = ! empty($slug) ? Str::slug($slug) : Str::slug($title);
+        if ($base === '') {
+            $base = 'post';
+        }
+
+        $candidate = $base;
+        $counter = 1;
+
+        while (
+            Post::where('slug', $candidate)
+                ->when($exceptId, fn ($q) => $q->where('id', '!=', $exceptId))
+                ->exists()
+        ) {
+            $candidate = $base . '-' . $counter++;
+        }
+
+        return $candidate;
     }
 }

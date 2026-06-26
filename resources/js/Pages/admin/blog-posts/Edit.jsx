@@ -17,23 +17,17 @@ import {
   CFormTextarea,
   CRow,
 } from '@coreui/react';
+import { getBrowserTimezone, toDatetimeLocalValue, formatScheduleLabel, datetimeLocalToUtcIso } from '@/utils/datetimeLocal';
 
 const themePrimary = '#FEA257';
 
 const defaultFaq = () => ({ question: '', answer: '' });
 
-function toDatetimeLocalValue(value) {
-  if (!value) return '';
-  const d = new Date(value);
-  if (Number.isNaN(d.getTime())) return '';
-  const pad = (n) => String(n).padStart(2, '0');
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
-}
-
 const Edit = ({ post, blogCategories = [], blogTags = [], flash }) => {
   const { data, setData, post: submitPost, processing, errors, transform } = useForm({
     _method: 'put',
     title: post.title || '',
+    slug: post.slug || '',
     content: post.content || '',
     excerpt: post.excerpt || '',
     meta_title: post.meta_title || '',
@@ -46,6 +40,7 @@ const Edit = ({ post, blogCategories = [], blogTags = [], flash }) => {
     visibility: post.visibility || 'public',
     status: post.status || 'draft',
     scheduled_publish_at: toDatetimeLocalValue(post.scheduled_publish_at),
+    scheduled_timezone: getBrowserTimezone(),
     faqs: Array.isArray(post.faqs) && post.faqs.length ? post.faqs : [defaultFaq()],
     image: null,
     remove_image: false,
@@ -56,6 +51,7 @@ const Edit = ({ post, blogCategories = [], blogTags = [], flash }) => {
   transform((form) => ({
     ...form,
     faqs: JSON.stringify(form.faqs || []),
+    scheduled_publish_at: datetimeLocalToUtcIso(form.scheduled_publish_at),
   }));
 
   const [preview, setPreview] = useState(post.featured_image_url || null);
@@ -93,6 +89,8 @@ const Edit = ({ post, blogCategories = [], blogTags = [], flash }) => {
     setData('faqs', next.length ? next : [defaultFaq()]);
   };
 
+  const clearSchedule = () => setData('scheduled_publish_at', '');
+
   const submit = (e) => {
     e.preventDefault();
     submitPost(route('admin-dashboard.blog-posts.update', post.id), {
@@ -129,6 +127,23 @@ const Edit = ({ post, blogCategories = [], blogTags = [], flash }) => {
                       invalid={!!errors.title}
                       feedbackInvalid={errors.title}
                     />
+                  </CCol>
+                </CRow>
+
+                <CRow className="mb-3">
+                  <CCol md={12}>
+                    <CFormLabel htmlFor="slug">Slug (optional)</CFormLabel>
+                    <CFormInput
+                      id="slug"
+                      value={data.slug}
+                      onChange={(e) => setData('slug', e.target.value)}
+                      placeholder="e.g., my-blog-post (leave empty to auto-generate from title)"
+                      invalid={!!errors.slug}
+                      feedbackInvalid={errors.slug}
+                    />
+                    <small className="text-muted">
+                      Public URL: /blog/<strong>{data.slug || post.slug || 'your-slug'}</strong>
+                    </small>
                   </CCol>
                 </CRow>
 
@@ -206,14 +221,31 @@ const Edit = ({ post, blogCategories = [], blogTags = [], flash }) => {
                     <p className="text-muted small mb-3">
                       Optional. Leave empty to show the post on the public blog as soon as it is <strong>Published</strong> and <strong>Public</strong>. If you set a date and time, visitors will not see it until then.
                     </p>
-                    <CFormLabel>Go live at</CFormLabel>
-                    <CFormInput
-                      type="datetime-local"
-                      value={data.scheduled_publish_at}
-                      onChange={(e) => setData('scheduled_publish_at', e.target.value)}
-                      invalid={!!errors.scheduled_publish_at}
-                      feedbackInvalid={errors.scheduled_publish_at}
-                    />
+                    <CFormLabel htmlFor="scheduled_publish_at">Go live at</CFormLabel>
+                    <div className="d-flex flex-wrap align-items-center gap-2">
+                      <CFormInput
+                        id="scheduled_publish_at"
+                        type="datetime-local"
+                        value={data.scheduled_publish_at}
+                        onChange={(e) => setData('scheduled_publish_at', e.target.value)}
+                        invalid={!!errors.scheduled_publish_at}
+                        feedbackInvalid={errors.scheduled_publish_at}
+                        style={{ maxWidth: 280 }}
+                      />
+                      {data.scheduled_publish_at ? (
+                        <CButton type="button" color="secondary" variant="outline" size="sm" onClick={clearSchedule}>
+                          Clear schedule
+                        </CButton>
+                      ) : null}
+                    </div>
+                    <div className="mt-2">
+                      {data.scheduled_publish_at ? (
+                        <span className="badge text-bg-warning me-2">Scheduled</span>
+                      ) : (
+                        <span className="badge text-bg-success me-2">Publish immediately</span>
+                      )}
+                     
+                    </div>
                   </CCardBody>
                 </CCard>
 

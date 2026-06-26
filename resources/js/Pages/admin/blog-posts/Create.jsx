@@ -17,6 +17,7 @@ import {
   CFormTextarea,
   CRow,
 } from '@coreui/react';
+import { getBrowserTimezone, formatScheduleLabel, datetimeLocalToUtcIso } from '@/utils/datetimeLocal';
 
 const themePrimary = '#FEA257';
 
@@ -25,6 +26,7 @@ const defaultFaq = () => ({ question: '', answer: '' });
 const Create = ({ blogCategories = [], blogTags = [], flash }) => {
   const { data, setData, post, processing, errors, transform } = useForm({
     title: '',
+    slug: '',
     content: '',
     excerpt: '',
     meta_title: '',
@@ -37,6 +39,7 @@ const Create = ({ blogCategories = [], blogTags = [], flash }) => {
     visibility: 'public',
     status: 'draft',
     scheduled_publish_at: '',
+    scheduled_timezone: getBrowserTimezone(),
     faqs: [defaultFaq()],
     image: null,
     blog_category_ids: [],
@@ -46,6 +49,7 @@ const Create = ({ blogCategories = [], blogTags = [], flash }) => {
   transform((form) => ({
     ...form,
     faqs: JSON.stringify(form.faqs || []),
+    scheduled_publish_at: datetimeLocalToUtcIso(form.scheduled_publish_at),
   }));
 
   const [preview, setPreview] = useState(null);
@@ -75,6 +79,8 @@ const Create = ({ blogCategories = [], blogTags = [], flash }) => {
     const next = (data.faqs || []).filter((_, i) => i !== index);
     setData('faqs', next.length ? next : [defaultFaq()]);
   };
+
+  const clearSchedule = () => setData('scheduled_publish_at', '');
 
   const submit = (e) => {
     e.preventDefault();
@@ -112,6 +118,23 @@ const Create = ({ blogCategories = [], blogTags = [], flash }) => {
                       invalid={!!errors.title}
                       feedbackInvalid={errors.title}
                     />
+                  </CCol>
+                </CRow>
+
+                <CRow className="mb-3">
+                  <CCol md={12}>
+                    <CFormLabel htmlFor="slug">Slug (optional)</CFormLabel>
+                    <CFormInput
+                      id="slug"
+                      value={data.slug}
+                      onChange={(e) => setData('slug', e.target.value)}
+                      placeholder="e.g., my-blog-post (leave empty to auto-generate from title)"
+                      invalid={!!errors.slug}
+                      feedbackInvalid={errors.slug}
+                    />
+                    <small className="text-muted">
+                      Public URL: /blog/<strong>{data.slug || 'your-slug'}</strong>
+                    </small>
                   </CCol>
                 </CRow>
 
@@ -189,14 +212,30 @@ const Create = ({ blogCategories = [], blogTags = [], flash }) => {
                     <p className="text-muted small mb-3">
                       Optional. Leave empty to show the post on the public blog as soon as it is <strong>Published</strong> and <strong>Public</strong>. If you set a date and time, visitors will not see it until then.
                     </p>
-                    <CFormLabel>Go live at</CFormLabel>
-                    <CFormInput
-                      type="datetime-local"
-                      value={data.scheduled_publish_at}
-                      onChange={(e) => setData('scheduled_publish_at', e.target.value)}
-                      invalid={!!errors.scheduled_publish_at}
-                      feedbackInvalid={errors.scheduled_publish_at}
-                    />
+                    <CFormLabel htmlFor="scheduled_publish_at">Go live at</CFormLabel>
+                    <div className="d-flex flex-wrap align-items-center gap-2">
+                      <CFormInput
+                        id="scheduled_publish_at"
+                        type="datetime-local"
+                        value={data.scheduled_publish_at}
+                        onChange={(e) => setData('scheduled_publish_at', e.target.value)}
+                        invalid={!!errors.scheduled_publish_at}
+                        feedbackInvalid={errors.scheduled_publish_at}
+                        style={{ maxWidth: 280 }}
+                      />
+                      {data.scheduled_publish_at ? (
+                        <CButton type="button" color="secondary" variant="outline" size="sm" onClick={clearSchedule}>
+                          Clear schedule
+                        </CButton>
+                      ) : null}
+                    </div>
+                    <div className="mt-2">
+                      {data.scheduled_publish_at ? (
+                        <span className="badge text-bg-warning me-2">Scheduled</span>
+                      ) : (
+                        <span className="badge text-bg-success me-2">Publish immediately</span>
+                      )}
+                    </div>
                   </CCardBody>
                 </CCard>
 
