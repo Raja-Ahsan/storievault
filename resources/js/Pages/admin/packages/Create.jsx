@@ -93,9 +93,9 @@ const Create = ({ flash }) => {
             newErrors.name = "Package name is required";
         }
 
-        if (!data.price_cents || isNaN(data.price_cents) || data.price_cents <= 0) {
+        if (data.price_cents === "" || isNaN(data.price_cents) || data.price_cents < 0) {
             newErrors.price_cents = "Valid price is required";
-        }
+          }
 
         if (!data.interval) {
             newErrors.interval = "Billing interval is required";
@@ -120,21 +120,21 @@ const Create = ({ flash }) => {
         e.preventDefault();
         
         // Validate form before submission
-        if (!validateForm()) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Validation Error!',
-                text: 'Please check your input and try again.',
-                confirmButtonColor: themeColors.primary,
-                background: '#fff',
-                customClass: {
-                    popup: 'swal2-custom-popup',
-                    title: 'swal2-custom-title',
-                    content: 'swal2-custom-content'
-                }
-            });
-            return;
-        }
+        // if (!validateForm()) {
+        //     Swal.fire({
+        //         icon: 'error',
+        //         title: 'Validation Error!',
+        //         text: 'Please check your input and try again.',
+        //         confirmButtonColor: themeColors.primary,
+        //         background: '#fff',
+        //         customClass: {
+        //             popup: 'swal2-custom-popup',
+        //             title: 'swal2-custom-title',
+        //             content: 'swal2-custom-content'
+        //         }
+        //     });
+        //     return;
+        // }
 
         // Show loading state
         Swal.fire({
@@ -272,19 +272,15 @@ const Create = ({ flash }) => {
                                                 id="price_cents"
                                                 type="number"
                                                 value={
-                                                    data.price_cents
-                                                        ? (
-                                                              data.price_cents /
-                                                              100
-                                                          ).toFixed(2)
+                                                    data.price_cents !== "" && data.price_cents !== null && data.price_cents !== undefined
+                                                        ? (data.price_cents / 100).toFixed(2)
                                                         : ""
-                                                }
+                                                  }
                                                 onChange={(e) => {
                                                     const value =
                                                         e.target.value;
                                                     if (
-                                                        value === "" ||
-                                                        value === "0"
+                                                        value === ""
                                                     ) {
                                                         setData(
                                                             "price_cents",

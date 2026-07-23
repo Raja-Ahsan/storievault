@@ -86,8 +86,18 @@ class PackagesController extends Controller
 
                 $data['stripe_price_id'] = $price->id;
             } else {
+
                 // Free package (no price)
-                $data['stripe_price_id'] = null;
+                $interval = $data['interval'] ?? 'month';
+                $price = Price::create([
+                    'unit_amount' => 0, // 0 cents
+                    'currency' => 'usd',
+                    'recurring' => ['interval' => $interval === 'yearly' ? 'year' : 'month'],
+                    'product' => $product->id,
+                    ]);
+                    
+                    $data['stripe_price_id'] = $price->id;
+                    // $data['stripe_price_id'] = null;
             }
 
             // ⚡ Save locally
