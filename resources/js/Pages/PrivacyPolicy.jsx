@@ -90,7 +90,7 @@ const PrivacyPolicy = () => {
                                         <h3 className="text-black fs-24 fw-600 mb-20">9. Contact Us</h3>
                                         <ul className="terms-list">
                                             <li className="mb-15 fs-16">
-                                                <a href="mailto:StorieVault@yahoo.com">StorieVault@yahoo.com</a>
+                                                <a href="mailto:storie_vault@yahoo.com">storie_vault@yahoo.com</a>
                                             </li>
                                         </ul>
                                     </div>
