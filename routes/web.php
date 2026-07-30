@@ -37,6 +37,7 @@ use App\Http\Controllers\Admin\RatingController as AdminRatingController;
 use App\Http\Controllers\Admin\BlogPostController;
 use App\Http\Controllers\Admin\BlogCategoryController;
 use App\Http\Controllers\Admin\BlogTagController;
+use App\Http\Controllers\Admin\NewsletterSubscriberController;
 use App\Http\Controllers\BlogController;
 
 // SEO: sitemap and robots.txt (served by Laravel, not Inertia)
@@ -114,11 +115,30 @@ Route::middleware(['auth', 'subscription'])->group(function () {
     Route::post('/community/store', [StoriesController::class, 'storeCommunity'])->name('community.store');
 });
 
-// Packages route - accessible without login
+// Packages route - accessible without login (public packages only)
 Route::get('/packages', function () {
-    $packages = \App\Models\Package::where('is_active', true)->get();
-    return Inertia::render('Packages', ['packages' => $packages]);
+    $packages = \App\Models\Package::publiclyListed()->get();
+    return Inertia::render('Packages', [
+        'packages' => $packages,
+        'inviteMode' => false,
+    ]);
 })->name('packages');
+
+// Private invite link for hidden packages (e.g. Free) — share with specific people
+Route::get('/packages/invite/{token}', function (string $token) {
+    $package = \App\Models\Package::where('invite_token', $token)
+        ->where('is_active', true)
+        ->firstOrFail();
+
+    return Inertia::render('Packages', [
+        'packages' => collect([$package]),
+        'inviteMode' => true,
+        'invitePackage' => $package,
+    ]);
+})->name('packages.invite');
+
+Route::post('/newsletter/subscribe', [\App\Http\Controllers\NewsletterController::class, 'subscribe'])
+    ->name('newsletter.subscribe');
 
 // Comments routes
 Route::get('/stories/{story}/comments', [CommentsController::class, 'getComments'])->name('comments.get');
@@ -218,6 +238,9 @@ Route::prefix('admin-dashboard')->name('admin-dashboard.')->middleware(['auth', 
     Route::resource('blog-posts', BlogPostController::class);
     Route::resource('blog-categories', BlogCategoryController::class)->except(['show']);
     Route::resource('blog-tags', BlogTagController::class)->except(['show']);
+
+    Route::get('newsletter', [NewsletterSubscriberController::class, 'index'])->name('newsletter.index');
+    Route::delete('newsletter/{newsletter}', [NewsletterSubscriberController::class, 'destroy'])->name('newsletter.destroy');
 
 });
 

@@ -55,6 +55,14 @@ class RegisteredUserController extends Controller
 
         Auth::login($user);
 
+        $redirect = $request->input('redirect');
+        if (is_string($redirect)
+            && str_starts_with($redirect, '/packages/invite/')
+            && ! str_contains($redirect, '://')
+        ) {
+            return redirect($redirect);
+        }
+
         return redirect(route('home', absolute: false));
     }
 }

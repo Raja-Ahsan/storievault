@@ -2,21 +2,22 @@ import React, { useState } from "react";
 import Layout from "@/Layouts/Layout";
 import { Head, Link, router } from "@inertiajs/react";
 
-
 const CreateContest = () => {
     const [selectedContestType, setSelectedContestType] = useState("");
+    const [showComingSoon, setShowComingSoon] = useState(false);
 
-
- 
-    // Contest options
     const contestOptions = [
         "Monthly Fiction Contest",
-        "Poetry Contest"
+        "Poetry Contest",
     ];
 
-
-
-
+    const handleSelectContest = (contest) => {
+        if (contest === "Poetry Contest") {
+            setShowComingSoon(true);
+            return;
+        }
+        setSelectedContestType(contest);
+    };
 
     const handleCreate = () => {
         if (!selectedContestType) return;
@@ -24,7 +25,7 @@ const CreateContest = () => {
         if (selectedContestType === "Monthly Fiction Contest") {
             router.visit("/monthly-fiction-contest");
         } else if (selectedContestType === "Poetry Contest") {
-            router.visit("/poetry-contest");
+            setShowComingSoon(true);
         }
     };
 
@@ -40,7 +41,6 @@ const CreateContest = () => {
                 }}
             >
                 <div className="container px-2 px-md-3 px-lg-4">
-                    {/* Header */}
                     <div className="row mb-5">
                         <div className="col-12">
                             <div
@@ -49,20 +49,18 @@ const CreateContest = () => {
                                     marginBottom: "30px",
                                 }}
                             >
-                                
                                 <h1
                                     style={{
                                         color: "#000",
                                         fontSize: "3.5rem",
                                         fontWeight: "800",
-                                        textShadow:
-                                            "0 2px 10px rgba(0,0,0,0.2)",
+                                        textShadow: "0 2px 10px rgba(0,0,0,0.2)",
                                         letterSpacing: "-0.5px",
                                         lineHeight: "1.2",
                                         marginBottom: "15px",
                                     }}
                                 >
-                                   Contests
+                                    Contests
                                 </h1>
                                 <p
                                     style={{
@@ -90,7 +88,6 @@ const CreateContest = () => {
                                     background: "#fff",
                                 }}
                             >
-                                {/* Header */}
                                 <div
                                     style={{
                                         background:
@@ -116,14 +113,11 @@ const CreateContest = () => {
                                             fontWeight: "500",
                                         }}
                                     >
-                                        Choose a contest to
-                                        participate
+                                        Choose a contest to participate
                                     </p>
                                 </div>
 
-                                {/* Content */}
                                 <div style={{ padding: "40px" }}>
-                                    {/* Contest Type Selection */}
                                     <div style={{ marginBottom: "40px" }}>
                                         <label
                                             style={{
@@ -144,112 +138,89 @@ const CreateContest = () => {
                                                 gap: "15px",
                                             }}
                                         >
-                                            {contestOptions.map(
-                                                (contest) => (
-                                                    <button
-                                                        key={contest}
-                                                        type="button"
-                                                        onClick={() => {
-                                                            setSelectedContestType(
-                                                                contest,
-                                                            );
-                                                        }}
-                                                        style={{
-                                                            padding: "20px",
-                                                            borderRadius:
-                                                                "12px",
-                                                            border:
-                                                                selectedContestType ===
-                                                                contest
-                                                                    ? "3px solid #fea257"
-                                                                    : "2px solid #e0e0e0",
-                                                            background:
-                                                                selectedContestType ===
-                                                                contest
-                                                                    ? "#fff5eb"
-                                                                    : "#fff",
-                                                            color: "#333",
-                                                            fontSize: "1.8rem",
-                                                            fontWeight: "600",
-                                                            cursor: "pointer",
-                                                            transition:
-                                                                "all 0.3s ease",
-                                                            boxShadow:
-                                                                selectedContestType ===
-                                                                contest
-                                                                    ? "0 5px 20px rgba(254, 162, 87, 0.2)"
-                                                                    : "none",
-                                                            position:
-                                                                "relative",
-                                                            overflow: "hidden",
-                                                        }}
-                                                        onMouseEnter={(e) => {
-                                                            if (
-                                                                selectedContestType !==
-                                                                contest
-                                                            ) {
-                                                                e.target.style.borderColor =
-                                                                    "#fea257";
-                                                                e.target.style.background =
-                                                                    "#fafafa";
-                                                            }
-                                                        }}
-                                                        onMouseLeave={(e) => {
-                                                            if (
-                                                                selectedContestType !==
-                                                                contest
-                                                            ) {
-                                                                e.target.style.borderColor =
-                                                                    "#e0e0e0";
-                                                                e.target.style.background =
-                                                                    "#fff";
-                                                            }
-                                                        }}
-                                                    >
-                                                        {selectedContestType ===
-                                                            contest && (
-                                                            <div
-                                                                style={{
-                                                                    position:
-                                                                        "absolute",
-                                                                    top: "8px",
-                                                                    right: "8px",
-                                                                    width: "24px",
-                                                                    height: "24px",
-                                                                    background:
-                                                                        "#fea257",
-                                                                    borderRadius:
-                                                                        "50%",
-                                                                    color: "#fff",
-                                                                    fontSize:
-                                                                        "1.8rem",
-                                                                    display:
-                                                                        "flex",
-                                                                    alignItems:
-                                                                        "center",
-                                                                    justifyContent:
-                                                                        "center",
-                                                                    fontWeight:
-                                                                        "bold",
-                                                                }}
-                                                            >
-                                                                ✓
-                                                            </div>
-                                                        )}
-                                                        {contest}
-                                                    </button>
-                                                ),
-                                            )}
+                                            {contestOptions.map((contest) => (
+                                                <button
+                                                    key={contest}
+                                                    type="button"
+                                                    onClick={() =>
+                                                        handleSelectContest(contest)
+                                                    }
+                                                    style={{
+                                                        padding: "20px",
+                                                        borderRadius: "12px",
+                                                        border:
+                                                            selectedContestType ===
+                                                            contest
+                                                                ? "3px solid #fea257"
+                                                                : "2px solid #e0e0e0",
+                                                        background:
+                                                            selectedContestType ===
+                                                            contest
+                                                                ? "#fff5eb"
+                                                                : "#fff",
+                                                        color: "#333",
+                                                        fontSize: "1.8rem",
+                                                        fontWeight: "600",
+                                                        cursor: "pointer",
+                                                        transition: "all 0.3s ease",
+                                                        boxShadow:
+                                                            selectedContestType ===
+                                                            contest
+                                                                ? "0 5px 20px rgba(254, 162, 87, 0.2)"
+                                                                : "none",
+                                                        position: "relative",
+                                                        overflow: "hidden",
+                                                    }}
+                                                >
+                                                    {selectedContestType ===
+                                                        contest && (
+                                                        <div
+                                                            style={{
+                                                                position:
+                                                                    "absolute",
+                                                                top: "8px",
+                                                                right: "8px",
+                                                                width: "24px",
+                                                                height: "24px",
+                                                                background:
+                                                                    "#fea257",
+                                                                borderRadius:
+                                                                    "50%",
+                                                                color: "#fff",
+                                                                fontSize:
+                                                                    "1.8rem",
+                                                                display: "flex",
+                                                                alignItems:
+                                                                    "center",
+                                                                justifyContent:
+                                                                    "center",
+                                                                fontWeight:
+                                                                    "bold",
+                                                            }}
+                                                        >
+                                                            ✓
+                                                        </div>
+                                                    )}
+                                                    {contest}
+                                                    {contest ===
+                                                        "Poetry Contest" && (
+                                                        <div
+                                                            style={{
+                                                                fontSize:
+                                                                    "1.1rem",
+                                                                color: "#fea257",
+                                                                marginTop: 8,
+                                                                fontWeight: 600,
+                                                            }}
+                                                        >
+                                                            Coming Soon
+                                                        </div>
+                                                    )}
+                                                </button>
+                                            ))}
                                         </div>
                                     </div>
 
-
-
-
-
-                                    {/* ...existing code... */}
-
-                                    {/* Action Buttons */}
                                     <div
                                         style={{
                                             display: "flex",
@@ -267,29 +238,8 @@ const CreateContest = () => {
                                                 color: "#6c757d",
                                                 fontSize: "1.2rem",
                                                 fontWeight: "600",
-                                                transition: "all 0.3s ease",
-                                                cursor: "pointer",
                                                 textDecoration: "none",
                                                 display: "inline-block",
-                                            }}
-                                            onMouseEnter={(e) => {
-                                                e.target.style.background =
-                                                    "#6c757d";
-                                                e.target.style.color = "#fff";
-                                                e.target.style.transform =
-                                                    "translateY(-2px)";
-                                                e.target.style.boxShadow =
-                                                    "0 5px 15px rgba(108, 117, 125, 0.3)";
-                                            }}
-                                            onMouseLeave={(e) => {
-                                                e.target.style.background =
-                                                    "transparent";
-                                                e.target.style.color =
-                                                    "#6c757d";
-                                                e.target.style.transform =
-                                                    "translateY(0)";
-                                                e.target.style.boxShadow =
-                                                    "none";
                                             }}
                                         >
                                             Cancel
@@ -297,53 +247,23 @@ const CreateContest = () => {
                                         <button
                                             type="button"
                                             onClick={handleCreate}
-                                            disabled={
-                                                !selectedContestType
-                                            }
+                                            disabled={!selectedContestType}
                                             style={{
                                                 padding: "12px 40px",
                                                 borderRadius: "10px",
-                                                background:
-                                                    selectedContestType
-                                                        ? "linear-gradient(135deg, #fea257 0%, #ff8c42 100%)"
-                                                        : "#ccc",
+                                                background: selectedContestType
+                                                    ? "linear-gradient(135deg, #fea257 0%, #ff8c42 100%)"
+                                                    : "#ccc",
                                                 border: "none",
                                                 color: "#fff",
                                                 fontSize: "1.5rem",
                                                 fontWeight: "600",
-                                                transition: "all 0.3s ease",
-                                                cursor:
-                                                    selectedContestType
-                                                        ? "pointer"
-                                                        : "not-allowed",
-                                                boxShadow:
-                                                    selectedContestType
-                                                        ? "0 5px 20px rgba(254, 162, 87, 0.4)"
-                                                        : "none",
-                                                display: "flex",
-                                                alignItems: "center",
-                                                justifyContent: "center",
-                                                gap: "8px",
-                                            }}
-                                            onMouseEnter={(e) => {
-                                                if (
-                                                    selectedContestType
-                                                ) {
-                                                    e.target.style.transform =
-                                                        "translateY(-2px)";
-                                                    e.target.style.boxShadow =
-                                                        "0 8px 25px rgba(254, 162, 87, 0.5)";
-                                                }
-                                            }}
-                                            onMouseLeave={(e) => {
-                                                if (
-                                                    selectedContestType
-                                                ) {
-                                                    e.target.style.transform =
-                                                        "translateY(0)";
-                                                    e.target.style.boxShadow =
-                                                        "0 5px 20px rgba(254, 162, 87, 0.4)";
-                                                }
+                                                cursor: selectedContestType
+                                                    ? "pointer"
+                                                    : "not-allowed",
+                                                boxShadow: selectedContestType
+                                                    ? "0 5px 20px rgba(254, 162, 87, 0.4)"
+                                                    : "none",
                                             }}
                                         >
                                             Create
@@ -356,18 +276,91 @@ const CreateContest = () => {
                 </div>
             </section>
 
-            <style>{`
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-            transform: translateY(-10px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-      `}</style>
+            {showComingSoon && (
+                <div
+                    role="dialog"
+                    aria-modal="true"
+                    onClick={() => setShowComingSoon(false)}
+                    style={{
+                        position: "fixed",
+                        inset: 0,
+                        background: "rgba(0,0,0,0.55)",
+                        zIndex: 9999,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        padding: 20,
+                    }}
+                >
+                    <div
+                        onClick={(e) => e.stopPropagation()}
+                        style={{
+                            background: "#fff",
+                            borderRadius: 16,
+                            maxWidth: 420,
+                            width: "100%",
+                            padding: "32px 28px",
+                            textAlign: "center",
+                            boxShadow: "0 20px 60px rgba(0,0,0,0.25)",
+                        }}
+                    >
+                        <div
+                            style={{
+                                width: 64,
+                                height: 64,
+                                borderRadius: "50%",
+                                background: "#fff5eb",
+                                color: "#fea257",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                fontSize: 28,
+                                fontWeight: 700,
+                                margin: "0 auto 16px",
+                            }}
+                        >
+                            ✦
+                        </div>
+                        <h3
+                            style={{
+                                fontSize: "2rem",
+                                fontWeight: 700,
+                                marginBottom: 10,
+                            }}
+                        >
+                            Coming Soon
+                        </h3>
+                        <p
+                            style={{
+                                color: "#666",
+                                fontSize: "1.2rem",
+                                marginBottom: 24,
+                                lineHeight: 1.5,
+                            }}
+                        >
+                            The Poetry Contest is not open yet. Stay tuned — we
+                            will launch it soon!
+                        </p>
+                        <button
+                            type="button"
+                            onClick={() => setShowComingSoon(false)}
+                            style={{
+                                padding: "12px 32px",
+                                borderRadius: 10,
+                                border: "none",
+                                background:
+                                    "linear-gradient(135deg, #fea257 0%, #ff8c42 100%)",
+                                color: "#fff",
+                                fontSize: "1.2rem",
+                                fontWeight: 600,
+                                cursor: "pointer",
+                            }}
+                        >
+                            Got it
+                        </button>
+                    </div>
+                </div>
+            )}
         </Layout>
     );
 };

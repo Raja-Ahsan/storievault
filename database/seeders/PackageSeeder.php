@@ -30,6 +30,8 @@ class PackageSeeder extends Seeder
             ],
             'stripe_price_id' => null,
             'is_active' => true,
+            'is_public' => false,
+            'invite_token' => \Illuminate\Support\Str::random(40),
         ]);
 
         Package::create([

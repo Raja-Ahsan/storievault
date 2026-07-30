@@ -7,49 +7,49 @@ export default function Chatbot() {
   const inputRef = useRef();
 
   const siteContext = {
-    name: "Story Vault",
-    description: "Story Vault is an interactive storytelling platform where users can read, extend, and publish creative stories. It blends community-driven writing with professional publishing opportunities.",
-    about: "Story Vault is a collaborative storytelling platform that empowers readers to become writers. Users can explore admin-published stories, continue them by writing their own chapters, and share their creations with the community. The platform also offers a paid publishing feature for users to request official distribution of their stories on external platforms. With genre-based filtering, character selection, and community interaction, Story Vault redefines how stories evolve through collective creativity.",
+    name: "Storie Vault",
+    description: "Storie Vault is an interactive storytelling platform where users can read, extend, and publish creative stories. It blends community-driven writing with professional publishing opportunities.",
+    about: "Storie Vault is a collaborative storytelling platform that empowers readers to become writers. Users can explore admin-published stories, continue them by writing their own chapters, and share their creations with the community. The platform also offers a paid publishing feature for users to request official distribution of their stories on external platforms. With genre-based filtering, character selection, and community interaction, Storie Vault redefines how stories evolve through collective creativity.",
     faq: [
         {
           q: "What does 'Where stories begin — and grow' mean?",
-          a: "It reflects Story Vault's vision to be more than just a writing platform. It's a living, evolving space where writers of all levels can explore, express, and grow creatively."
+          a: "It reflects Storie Vault's vision to be more than just a writing platform. It's a living, evolving space where writers of all levels can explore, express, and grow creatively."
         },
         {
-          q: "Is Story Vault a finished platform?",
-          a: "No, Story Vault is constantly evolving. New features, tools, and opportunities are being developed to enhance the experience for writers and readers alike."
+          q: "Is Storie Vault a finished platform?",
+          a: "No, Storie Vault is constantly evolving. New features, tools, and opportunities are being developed to enhance the experience for writers and readers alike."
         },
         {
-          q: "Who is Story Vault built for?",
-          a: "Story Vault is for everyone — from first-time storytellers to experienced writers. It's a space designed to support all levels of creative expression."
+          q: "Who is Storie Vault built for?",
+          a: "Storie Vault is for everyone — from first-time storytellers to experienced writers. It's a space designed to support all levels of creative expression."
         },
         {
-          q: "What inspired the creation of Story Vault?",
+          q: "What inspired the creation of Storie Vault?",
           a: "The platform was born from a mind full of imagination and storytelling passion — built for people who have ideas racing through their heads but need the right place to shape them into stories."
         },
         {
-          q: "How does AI fit into Story Vault?",
-          a: "AI in Story Vault acts as a creative assistant. It doesn't write for you but supports you by offering grammar help, idea shaping, and inspiration when you're stuck."
+          q: "How does AI fit into Storie Vault?",
+          a: "AI in Storie Vault acts as a creative assistant. It doesn't write for you but supports you by offering grammar help, idea shaping, and inspiration when you're stuck."
         },
         {
-          q: "Is AI required to write on Story Vault?",
-          a: "Not at all. You don’t have to use AI if you prefer writing independently. It's there as a tool — completely optional, never mandatory."
+          q: "Is AI required to write on Storie Vault?",
+          a: "Not at all. You don't have to use AI if you prefer writing independently. It's there as a tool — completely optional, never mandatory."
         },
         {
           q: "Can AI replace my creativity?",
-          a: "No, and it shouldn't. AI is used to support your creativity — not replace it. Your voice, your thoughts, and your story remain at the center."
+          a: "No, and it shouldn't. AI is used to support your creativity — not replace it. Your voice, your thoughts, and your storie remain at the center."
         },
         {
           q: "Why offer AI tools if stories are meant to be human?",
-          a: "Because even creative minds need a little help sometimes — whether it's to overcome writer’s block, fix grammar, or spark new ideas. AI is just there to gently guide your creativity, not take over."
+          a: "Because even creative minds need a little help sometimes — whether it's to overcome writer's block, fix grammar, or spark new ideas. AI is just there to gently guide your creativity, not take over."
         },
         {
-          q: "What’s the philosophy behind AI on Story Vault?",
-          a: "Story Vault believes great stories come from real people. AI is simply a supporting tool — like a notepad, a thesaurus, or a friend offering ideas. You stay in control."
+          q: "What's the philosophy behind AI on Storie Vault?",
+          a: "Storie Vault believes great stories come from real people. AI is simply a supporting tool — like a notepad, a thesaurus, or a friend offering ideas. You stay in control."
         },
         {
-          q: "What makes Story Vault different from other platforms?",
-          a: "It’s not static or fixed. Story Vault is a creative journey that evolves with its writers. It grows with your input, adapts to your needs, and values your voice above all."
+          q: "What makes Storie Vault different from other platforms?",
+          a: "It's not static or fixed. Storie Vault is a creative journey that evolves with its writers. It grows with your input, adapts to your needs, and values your voice above all."
         }
       ]
       
@@ -69,6 +69,8 @@ export default function Chatbot() {
     return `Context: Site Name: ${siteContext.name}
 Description: ${siteContext.description}
 About: ${siteContext.about}
+
+Important branding rule: Always spell the brand as "Storie Vault" (not "Story Vault"). Prefer "storie" instead of "story" when referring to the brand or platform name.
 
 User: ${userMessage}`;
   };

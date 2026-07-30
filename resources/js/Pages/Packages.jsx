@@ -13,13 +13,25 @@ import CheckoutForm from "@/Components/CheckoutForm";
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_KEY);
 
-const Packages = ({ packages = [] }) => {
+const Packages = ({ packages = [], inviteMode = false, invitePackage = null }) => {
     const { auth } = usePage().props;
     const [selectedPackageId, setSelectedPackageId] = useState(null);
     const [showModal, setShowModal] = useState(false);
     const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("card");
     const [isAuthLoading, setIsAuthLoading] = useState(false);
     const [activeTab, setActiveTab] = useState('monthly'); // Add tab state
+
+    // Invite link: open the free/private package checkout modal automatically after login
+    useEffect(() => {
+        if (inviteMode && invitePackage?.id && auth.user?.id) {
+            const autoOpen = sessionStorage.getItem('invitePackageAutoOpen');
+            if (autoOpen === String(invitePackage.id)) {
+                sessionStorage.removeItem('invitePackageAutoOpen');
+                setSelectedPackageId(invitePackage.id);
+                setShowModal(true);
+            }
+        }
+    }, [inviteMode, invitePackage, auth.user]);
 
     // Check if user just registered and should be redirected back to packages
     useEffect(() => {
@@ -91,6 +103,7 @@ const Packages = ({ packages = [] }) => {
               package_name: pkg.name,
               amount: pkg.price_cents,
               stripe_price_id: pkg.stripe_price_id,
+              package_id: pkg.id,
             }),
           });
       
@@ -135,7 +148,11 @@ const Packages = ({ packages = [] }) => {
             return;
           }
       
-              const data = await response.json();
+          const data = await response.json();
+          if (data.free && data.redirect) {
+            window.location.href = data.redirect;
+            return;
+          }
           if (data.id) {
             const stripe = await stripePromise;
             stripe.redirectToCheckout({ sessionId: data.id });
@@ -157,9 +174,14 @@ const Packages = ({ packages = [] }) => {
     const handleGetStarted = (packageId) => {
         // Check if user is authenticated
         if (!auth.user) {
-            // Store the intended package ID in session storage to redirect back after registration
             sessionStorage.setItem('intendedPackageId', packageId);
-            // Redirect to register page
+            if (inviteMode && invitePackage?.invite_token) {
+                sessionStorage.setItem('invitePackageAutoOpen', String(packageId));
+                const returnUrl = `/packages/invite/${invitePackage.invite_token}`;
+                sessionStorage.setItem('invitePackageReturnUrl', returnUrl);
+                router.visit(`/register?redirect=${encodeURIComponent(returnUrl)}`);
+                return;
+            }
             router.visit(route('register'));
             return;
         }
@@ -328,15 +350,17 @@ const Packages = ({ packages = [] }) => {
         );
     };
 
-    // Filter packages by active tab
-    const filteredPackages = (packages || []).filter(pkg => {
-        if (activeTab === 'monthly') {
-            return pkg.interval === 'month' || pkg.interval === 'monthly';
-        } else if (activeTab === 'yearly') {
-            return pkg.interval === 'year' || pkg.interval === 'yearly';
-        }
-        return true; // Show all if no specific tab
-    });
+    // Filter packages by active tab (invite mode shows the invited package as-is)
+    const filteredPackages = inviteMode
+        ? (packages || [])
+        : (packages || []).filter(pkg => {
+            if (activeTab === 'monthly') {
+                return pkg.interval === 'month' || pkg.interval === 'monthly';
+            } else if (activeTab === 'yearly') {
+                return pkg.interval === 'year' || pkg.interval === 'yearly';
+            }
+            return true;
+        });
 
     // Transform database packages to match the expected format
     const transformedPackages = filteredPackages.map((pkg, index) => {
@@ -579,17 +603,22 @@ const Packages = ({ packages = [] }) => {
                                 <span className="">Packages</span>
                             </h2>
                             <h5 className="secondry-font fs-30 light-black mb-20">
-                                Choose Your Perfect Plan
+                                {inviteMode
+                                    ? 'Your Special Invite Plan'
+                                    : 'Choose Your Perfect Plan'}
                             </h5>
                             <p className="fs-20 mb-30">
-                                Select the subscription plan that best fits your writing goals and budget.
+                                {inviteMode
+                                    ? 'This private link gives you access to a package that is not listed publicly.'
+                                    : 'Select the subscription plan that best fits your writing goals and budget.'}
                             </p>
                         </div>
                     </div>
                 </div>
             </section>
 
-            {/* Package Tabs */}
+            {/* Package Tabs — hidden on private invite links */}
+            {!inviteMode && (
             <section className="sec-bg pb-50">
                 <div className="container">
                     <div className="row justify-content-center">
@@ -602,9 +631,6 @@ const Packages = ({ packages = [] }) => {
                                     >
                                         <span className="tab-text">Monthly Plans</span>
                                         <span className="tab-badge">Most Popular</span>
-                                        {/* <span className="tab-count">
-                                            {packages.filter(pkg => pkg.interval === 'month' || pkg.interval === 'monthly').length} Plans
-                                        </span> */}
                                     </button>
                                     <button
                                         className={`package-tab ${activeTab === 'yearly' ? 'active' : ''}`}
@@ -612,9 +638,6 @@ const Packages = ({ packages = [] }) => {
                                     >
                                         <span className="tab-text">Yearly Plans</span>
                                         <span className="tab-badge">Save 20%</span>
-                                        {/* <span className="tab-count">
-                                            {packages.filter(pkg => pkg.interval === 'year' || pkg.interval === 'yearly').length} Plans
-                                        </span> */}
                                     </button>
                                 </div>
                             </div>
@@ -622,6 +645,7 @@ const Packages = ({ packages = [] }) => {
                     </div>
                 </div>
             </section>
+            )}
             <section className="sec-bg pb-100">
                 <div className="container">
                     <div className="row row-gap-20 justify-content-center">

@@ -6,12 +6,16 @@ import CustomAuthLayout from '@/Layouts/CustomAuthLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
 
 export default function Register() {
+    const params = new URLSearchParams(window.location.search);
+    const redirectTo = params.get('redirect') || '';
+
     const { data, setData, post, processing, errors, reset } = useForm({
         full_name: '',
         username: '',
         email: '',
         password: '',
         password_confirmation: '',
+        redirect: redirectTo,
     });
 
     const submit = (e) => {

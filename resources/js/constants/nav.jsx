@@ -7,6 +7,7 @@ import {
   cilCursor,
   cilDescription,
   cilDrop,
+  cilEnvelopeOpen,
   cilExternalLink,
   cilNotes,
   cilPencil,
@@ -163,6 +164,12 @@ const adminNav = [
         to: '/admin-dashboard/coupons/create',
       },
     ],
+  },
+  {
+    component: CNavItem,
+    name: 'Newsletter',
+    to: '/admin-dashboard/newsletter',
+    icon: <CIcon icon={cilEnvelopeOpen} customClassName="nav-icon" />,
   },
   {
     component: CNavGroup,

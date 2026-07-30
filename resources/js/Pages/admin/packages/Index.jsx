@@ -164,7 +164,7 @@ function Index({ packages, flash }) {
                                                     </div>
                                                 </CTableDataCell>
                                                 <CTableDataCell>
-                                                    <div className="d-flex gap-2">
+                                                    <div className="d-flex gap-2 align-items-center flex-wrap">
                                                         {[
                                                             <CTooltip key="view" content="View Package">
                                                                 <CButton className='btn-icon-size p-0'
@@ -180,6 +180,28 @@ function Index({ packages, flash }) {
                                                                     <Icons.Edit />
                                                                 </CButton>
                                                             </CTooltip>,
+                                                            !pkg.is_public && pkg.invite_token ? (
+                                                                <CTooltip key="invite" content="Copy private invite link">
+                                                                    <CButton
+                                                                        size="sm"
+                                                                        color="warning"
+                                                                        variant="outline"
+                                                                        onClick={() => {
+                                                                            const url = `${window.location.origin}/packages/invite/${pkg.invite_token}`;
+                                                                            navigator.clipboard.writeText(url).then(() => {
+                                                                                Swal.fire({
+                                                                                    icon: 'success',
+                                                                                    title: 'Invite link copied!',
+                                                                                    text: url,
+                                                                                    confirmButtonColor: '#FEA257',
+                                                                                });
+                                                                            });
+                                                                        }}
+                                                                    >
+                                                                        Copy Link
+                                                                    </CButton>
+                                                                </CTooltip>
+                                                            ) : null,
                                                             <CTooltip key="delete" content="Delete Package">
                                                                 <CButton className='btn-icon-size p-0'  
                                                                     onClick={() => confirmDelete(pkg)}
@@ -189,6 +211,11 @@ function Index({ packages, flash }) {
                                                             </CTooltip>,
                                                         ].filter(Boolean)}
                                                     </div>
+                                                    {!pkg.is_public && (
+                                                        <div className="mt-1">
+                                                            <CBadge color="warning">Private invite only</CBadge>
+                                                        </div>
+                                                    )}
                                                 </CTableDataCell>
                                             </CTableRow>
                                         ))

@@ -1,6 +1,34 @@
-import { Link } from '@inertiajs/react';
+import { useState } from 'react';
+import { Link, useForm, usePage } from '@inertiajs/react';
 import { Icons } from '../../utils/icons';
+
 const Footer = () => {
+  const { flash } = usePage().props;
+  const { data, setData, post, processing, errors, reset } = useForm({
+    email: '',
+  });
+  const [localMessage, setLocalMessage] = useState('');
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setLocalMessage('');
+    post(route('newsletter.subscribe'), {
+      preserveScroll: true,
+      onSuccess: (page) => {
+        reset('email');
+        setLocalMessage(
+          page.props.flash?.newsletter_success ||
+            'Thanks for subscribing to our newsletter!',
+        );
+      },
+      onError: () => {
+        setLocalMessage('');
+      },
+    });
+  };
+
+  const successMessage = localMessage || flash?.newsletter_success;
+
   return (
     <footer className='footer'>
       <div className="container">
@@ -40,14 +68,35 @@ const Footer = () => {
             <div className="col-lg-4">
               <h4 className='fs-36 secondry-font text-primary fw-600 mb-30'>Contact Us</h4>
               <div className="footer-contact-info">
-                <p className='fs-18 secondry-font d-flex align-items-center text-white fw-500 mb-20'><span className='md-circle mr-10'><i class="fa-solid fa-envelope"></i></span> <a className='' href="mailto:storie_vault@yahoo.com">storie_vault@yahoo.com</a></p>
+                <p className='fs-18 secondry-font d-flex align-items-center text-white fw-500 mb-20'><span className='md-circle mr-10'><i className="fa-solid fa-envelope"></i></span> <a className='' href="mailto:storie_vault@yahoo.com">storie_vault@yahoo.com</a></p>
               </div>
               <h4 className='fs-36 secondry-font footer-newsletter-hd text-white fw-500 mb-20'>Subscribe To Our Newsletter</h4>
-              <form action="">
+              <form onSubmit={handleSubmit}>
                 <div className="field-wrapper position-relative">
-                  <input type="text" className='input-field' placeholder='Enter Your Email  Address' />
-                  <button type='submit' className='btn-primary position-absolute translate-middle-y top-50'><Icons.Send className='text-white fs-25' /></button>
+                  <input
+                    type="email"
+                    className='input-field'
+                    placeholder='Enter Your Email  Address'
+                    value={data.email}
+                    onChange={(e) => setData('email', e.target.value)}
+                    required
+                    disabled={processing}
+                  />
+                  <button
+                    type='submit'
+                    className='btn-primary position-absolute translate-middle-y top-50'
+                    disabled={processing}
+                    aria-label="Subscribe"
+                  >
+                    <Icons.Send className='text-white fs-25' />
+                  </button>
                 </div>
+                {errors.email && (
+                  <p className="text-danger fs-14 mt-2 mb-0">{errors.email}</p>
+                )}
+                {successMessage && (
+                  <p className="text-success fs-14 mt-2 mb-0">{successMessage}</p>
+                )}
               </form>
             </div>
           </div>

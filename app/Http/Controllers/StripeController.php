@@ -32,8 +32,43 @@ class StripeController extends Controller
             if ($mode === 'subscription') {
                 // Existing subscription logic
                 $packageName = $request->input('package_name', 'Default Package');
-                $amount = $request->input('amount', 1900);
+                $amount = (int) $request->input('amount', 1900);
                 $packagePriceId = $request->input('stripe_price_id');
+
+                // Free / $0 packages with no Stripe price: activate locally (invite link flow)
+                if ($amount === 0 && empty($packagePriceId)) {
+                    $packageId = $request->input('package_id');
+                    $package = $packageId
+                        ? \App\Models\Package::where('id', $packageId)->where('is_active', true)->first()
+                        : \App\Models\Package::where('is_active', true)
+                            ->where(function ($q) {
+                                $q->where('price_cents', 0)->orWhereNull('price_cents');
+                            })
+                            ->orderByDesc('id')
+                            ->first();
+
+                    if (! $package) {
+                        return response()->json(['error' => 'Free package not found'], 404);
+                    }
+
+                    \App\Models\Subscription::updateOrCreate(
+                        ['user_id' => $user->id],
+                        [
+                            'type' => 'free',
+                            'stripe_id' => 'free_' . $user->id . '_' . time(),
+                            'stripe_status' => 'active',
+                            'stripe_price' => $package->stripe_price_id,
+                            'quantity' => 1,
+                            'trial_ends_at' => null,
+                            'ends_at' => null,
+                        ]
+                    );
+
+                    return response()->json([
+                        'free' => true,
+                        'redirect' => route('subscription.success'),
+                    ]);
+                }
                 
                 if (!$packagePriceId) {
                     return response()->json(['error' => 'Stripe Price ID missing'], 422);
