@@ -152,7 +152,7 @@ const Edit = ({ category, flash }) => {
                       id="meta_title"
                       value={data.meta_title}
                       onChange={(e) => setData('meta_title', e.target.value)}
-                      placeholder="e.g., Best Adventure Stories | Storie Vault"
+                      placeholder="e.g., Best Adventure Stories"
                       className={errors.meta_title ? 'is-invalid' : ''}
                     />
                     {errors.meta_title && <div className="invalid-feedback">{errors.meta_title}</div>}

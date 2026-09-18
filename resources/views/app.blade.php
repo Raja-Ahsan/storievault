@@ -7,7 +7,7 @@
         <!-- google site verification -->
         <meta name="google-site-verification" content="Sx6feX4ZcWsScQKKZhPgQKGi1d-jpsGVnwzn_f721E4" />
         <base href="/" />
-        <title inertia>StoriVault</title>
+        <title inertia>Storie Vault</title>
 
         <!-- Canonical Link -->
 

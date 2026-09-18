@@ -8,7 +8,7 @@ import { DEFAULT_COVER_IMAGE, onCoverImageError } from '@/utils/imageFallback';
 const Index = ({ posts }) => {
   return (
     <Layout headerClass="inner-header">
-      <Head title="Blog | StoriVault">
+      <Head title="Blog">
         <meta
           name="description"
           content="News, writing tips, community updates, and publishing guides from StoriVault."

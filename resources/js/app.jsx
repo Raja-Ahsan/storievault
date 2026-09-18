@@ -12,11 +12,21 @@ import { createRoot } from 'react-dom/client';
 // Import HelmetProvider
 import { HelmetProvider } from 'react-helmet-async';
 
-const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
+const appName = 'Storie Vault';
+const leadingBrand = /^(Storie\s*Vault|StoriVault|StoryVault|Story\s*Vault)(\s+Blog)?\s*[|–—-]\s*/i;
+const trailingBrand = /\s*[|–—-]\s*(Storie\s*Vault|StoriVault|StoryVault|Story\s*Vault)(\s+Blog)?$/i;
 
 createInertiaApp({
-    // Use page title as-is when set (e.g. "StoryVault | Save Memories"); otherwise fall back to app name
-    title: (title) => (title && title.trim() ? title : appName),
+    title: (title) => {
+        let pageTitle = (title || '').trim();
+        if (!pageTitle) {
+            return appName;
+        }
+
+        pageTitle = pageTitle.replace(leadingBrand, '').replace(trailingBrand, '').trim();
+
+        return pageTitle ? `${appName} | ${pageTitle}` : appName;
+    },
     resolve: (name) =>
         resolvePageComponent(
             `./Pages/${name}.jsx`,

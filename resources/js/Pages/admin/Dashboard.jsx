@@ -1,7 +1,7 @@
 import React from 'react'
 import DashboardLayout from '../../Layouts/DashboardLayout'
 import classNames from 'classnames'
-import { usePage } from '@inertiajs/react';
+import { Head, usePage } from '@inertiajs/react';
 import {
   CAvatar,
   CButton,
@@ -86,7 +86,7 @@ const Dashboard = () => {
   ]
   return (
     <DashboardLayout>
-
+      <Head title="Dashboard" />
 
       <>
         {/* <WidgetsDropdown

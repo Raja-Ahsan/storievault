@@ -17,8 +17,8 @@ const Home = () => {
 
   return (
     <Layout headerClass="pt-30 home-page-wrapper" mainClass="home-page-wrapper">
-      <Head title="StoryVault | Save Memories & Share Your Story">
-        <meta name="description" content="Join StoryVault to save, share & explore personal stories and memories from around the world — a growing archive of human history for families, students & future generations." />
+      <Head title="Save Memories & Share Your Story">
+        <meta name="description" content="Join StorieVault to save, share & explore personal stories and memories from around the world — a growing archive of human history for families, students & future generations." />
         <link rel="canonical" href={`https://storievault.com${url}`} />
       </Head>
       <HeroBanner />

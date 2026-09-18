@@ -17,7 +17,7 @@ const Show = ({ post }) => {
 
   return (
     <Layout headerClass="inner-header">
-      <Head title={`${pageTitle} | StoriVault Blog`}>
+      <Head title={pageTitle}>
         {desc && <meta name="description" content={desc} />}
         {post.meta_tags && <meta name="keywords" content={post.meta_tags} />}
         {post.facebook_meta && <meta property="og:title" content={post.facebook_meta} />}

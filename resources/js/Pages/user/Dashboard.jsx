@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import DashboardLayout from '../../Layouts/DashboardLayout'
-import { usePage, router } from '@inertiajs/react'
+import { Head, usePage, router } from '@inertiajs/react'
 import { CCard, CCardBody, CRow, CCol } from '@coreui/react'
 import { Icons } from '../../utils/icons'
 import Swal from 'sweetalert2'
@@ -376,6 +376,7 @@ const UserDashboard = () => {
 
   return (
     <>
+      <Head title="Dashboard" />
       <style>
         {`
           .swal-wide {
