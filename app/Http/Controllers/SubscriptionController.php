@@ -16,7 +16,7 @@ class SubscriptionController extends Controller
     public function subscribe(Request $request, Package $package)
     {
         try {
-            Stripe::setApiKey(env('STRIPE_SECRET'));
+            Stripe::setApiKey(config('services.stripe.secret'));
 
             $user = $request->user();
             $paymentMethod = $request->input('payment_method');
@@ -35,10 +35,9 @@ class SubscriptionController extends Controller
                 'expand' => ['latest_invoice.payment_intent'],
             ]);
 
-            // Update user with subscription info
+            // Update user with subscription info (Cashier uses stripe_id for customer)
             $user->update([
-                'stripe_customer_id' => $customer->id,
-                'stripe_subscription_id' => $subscription->id,
+                'stripe_id' => $customer->id,
             ]);
 
             LocalSubscription::create([
@@ -57,14 +56,15 @@ class SubscriptionController extends Controller
 
             return response()->json(['success' => true, 'subscription_id' => $subscription->id]);
         } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 400);
+            Log::error('Subscription create failed: '.$e->getMessage());
+            return response()->json(['error' => 'Your payment could not be completed. Please check your details or try another payment method.'], 400);
         }
     }
 
     private function getOrCreateStripeCustomer($user)
     {
-        if ($user->stripe_customer_id) {
-            return Customer::retrieve($user->stripe_customer_id);
+        if ($user->stripe_id) {
+            return Customer::retrieve($user->stripe_id);
         }
 
         $customer = Customer::create([
@@ -75,7 +75,7 @@ class SubscriptionController extends Controller
             ],
         ]);
 
-        $user->update(['stripe_customer_id' => $customer->id]);
+        $user->update(['stripe_id' => $customer->id]);
 
         return $customer;
     }
@@ -115,7 +115,7 @@ class SubscriptionController extends Controller
                 return response()->json(['error' => 'Package not found'], 404);
             }
 
-            Stripe::setApiKey(env('STRIPE_SECRET'));
+            Stripe::setApiKey(config('services.stripe.secret'));
 
             // Get the current Stripe subscription
             $stripeSubscription = \Stripe\Subscription::retrieve($subscription->stripe_id);
@@ -192,7 +192,7 @@ class SubscriptionController extends Controller
             }
         } catch (\Exception $e) {
             Log::error('Subscription renewal failed: ' . $e->getMessage());
-            return response()->json(['error' => 'Renewal failed: ' . $e->getMessage()], 500);
+            return response()->json(['error' => 'Your payment could not be completed. Please try again.'], 500);
         }
     }
 
@@ -245,7 +245,7 @@ class SubscriptionController extends Controller
             ]);
         } catch (\Exception $e) {
             Log::error('Toggle renewal failed: ' . $e->getMessage());
-            return response()->json(['error' => 'Failed to toggle renewal: ' . $e->getMessage()], 500);
+            return response()->json(['error' => 'We could not update auto-renewal right now. Please try again.'], 500);
         }
     }
 

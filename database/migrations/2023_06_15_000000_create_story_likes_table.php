@@ -11,31 +11,32 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('story_likes', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('story_id')->constrained()->onDelete('cascade');
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->timestamps();
-            
-            // Add a unique constraint to prevent duplicate likes
-            $table->unique(['story_id', 'user_id']);
-        });
-        
-        // Add likes_count column to stories table
-        Schema::table('stories', function (Blueprint $table) {
-            $table->integer('likes_count')->default(0)->after('comment_count');
-        });
+        if (! Schema::hasTable('story_likes')) {
+            Schema::create('story_likes', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('story_id')->constrained()->onDelete('cascade');
+                $table->foreignId('user_id')->constrained()->onDelete('cascade');
+                $table->timestamps();
+
+                $table->unique(['story_id', 'user_id']);
+            });
+        }
+
+        if (Schema::hasTable('stories') && ! Schema::hasColumn('stories', 'likes_count')) {
+            Schema::table('stories', function (Blueprint $table) {
+                $table->integer('likes_count')->default(0);
+            });
+        }
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('story_likes');
-        
-        Schema::table('stories', function (Blueprint $table) {
-            $table->dropColumn('likes_count');
-        });
+
+        if (Schema::hasTable('stories') && Schema::hasColumn('stories', 'likes_count')) {
+            Schema::table('stories', function (Blueprint $table) {
+                $table->dropColumn('likes_count');
+            });
+        }
     }
 };

@@ -11,9 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (! Schema::hasTable('stories')) {
+            return;
+        }
+
         Schema::table('stories', function (Blueprint $table) {
-            $table->boolean('is_community')->default(false)->after('comment_count');
-            $table->longText('content')->nullable()->after('description');
+            if (! Schema::hasColumn('stories', 'is_community')) {
+                $table->boolean('is_community')->default(false);
+            }
+            if (! Schema::hasColumn('stories', 'content')) {
+                $table->longText('content')->nullable();
+            }
         });
     }
 
@@ -22,9 +30,17 @@ return new class extends Migration
      */
     public function down(): void
     {
+        if (! Schema::hasTable('stories')) {
+            return;
+        }
+
         Schema::table('stories', function (Blueprint $table) {
-            $table->dropColumn('is_community');
-            $table->dropColumn('content');
+            if (Schema::hasColumn('stories', 'is_community')) {
+                $table->dropColumn('is_community');
+            }
+            if (Schema::hasColumn('stories', 'content')) {
+                $table->dropColumn('content');
+            }
         });
     }
 };

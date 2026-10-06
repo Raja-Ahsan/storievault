@@ -29,5 +29,9 @@
         <env name="QUEUE_CONNECTION" value="sync"/>
         <env name="SESSION_DRIVER" value="array"/>
         <env name="TELESCOPE_ENABLED" value="false"/>
+        <env name="STRIPE_KEY" value="pk_test_fake_key_for_tests"/>
+        <env name="STRIPE_SECRET" value="sk_test_fake_secret_for_tests"/>
+        <env name="STRIPE_WEBHOOK_SECRET" value="whsec_test_secret_for_automated_tests"/>
+        <env name="VITE_STRIPE_KEY" value="pk_test_fake_key_for_tests"/>
     </php>
 </phpunit>

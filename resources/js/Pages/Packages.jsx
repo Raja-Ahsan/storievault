@@ -19,6 +19,8 @@ const Packages = ({ packages = [], inviteMode = false, invitePackage = null }) =
     const [showModal, setShowModal] = useState(false);
     const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("card");
     const [isAuthLoading, setIsAuthLoading] = useState(false);
+    const [isCheckoutLoading, setIsCheckoutLoading] = useState(false);
+    const [checkoutError, setCheckoutError] = useState(null);
     const [activeTab, setActiveTab] = useState('monthly'); // Add tab state
 
     // Invite link: open the free/private package checkout modal automatically after login
@@ -76,17 +78,19 @@ const Packages = ({ packages = [], inviteMode = false, invitePackage = null }) =
     }, [auth.user]);
 
     const handleCheckoutRedirect = async (pkg) => {
-        // Debug: Log authentication state
-        console.log('Checkout attempt - Auth state:', auth.user);
-        
+        if (isCheckoutLoading) {
+            return;
+        }
+
+        setCheckoutError(null);
+        setIsCheckoutLoading(true);
+
         try {
-          // Get CSRF token from meta tag
           let csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute("content");
           if (!csrfToken) {
-            // Try to get from window object (fallback)
             csrfToken = window.csrfToken;
             if (!csrfToken) {
-              alert("CSRF token not found. Please refresh the page and try again.");
+              setCheckoutError("Your session could not be verified. Please refresh the page and try again.");
               return;
             }
           }
@@ -100,73 +104,69 @@ const Packages = ({ packages = [], inviteMode = false, invitePackage = null }) =
               "Accept": "application/json",
             },
             body: JSON.stringify({
-              package_name: pkg.name,
-              amount: pkg.price_cents,
-              stripe_price_id: pkg.stripe_price_id,
               package_id: pkg.id,
+              mode: "subscription",
             }),
           });
-      
-          // Debug: Log response details
-          console.log('Response status:', response.status);
-          console.log('Response headers:', Object.fromEntries(response.headers.entries()));
-          
-          // Check for different response statuses
+
+          let data = {};
+          try {
+            data = await response.json();
+          } catch (_) {
+            data = {};
+          }
+
+          const friendly =
+            data?.error ||
+            "We couldn't start checkout right now. Please try again.";
+
           if (response.status === 401) {
-            // User is not authenticated, redirect to login
-            alert("Please log in to continue with your subscription.");
+            setCheckoutError("Please log in to continue with your subscription.");
             router.visit(route('login'));
             return;
           }
-          
+
           if (response.status === 419) {
-            // CSRF token mismatch or session expired
-            alert("Your session has expired. The page will refresh automatically to fix this issue.");
-            // Store the package info to retry after refresh
-            sessionStorage.setItem('retryPackage', JSON.stringify(pkg));
+            setCheckoutError("Your session has expired. Refreshing…");
+            sessionStorage.setItem('retryPackage', JSON.stringify({ id: pkg.id }));
             setTimeout(() => window.location.reload(), 1000);
             return;
           }
-          
-          if (response.status === 422) {
-            // Validation error
-            const errorData = await response.json();
-            alert("Validation error: " + (errorData.message || "Please check your input."));
+
+          if (response.status === 409) {
+            setCheckoutError(friendly);
             return;
           }
-          
-          if (response.status === 403) {
-            // Forbidden - user might not have permission
-            alert("Access denied. Please check your account permissions.");
-            return;
-          }
-          
+
           if (!response.ok) {
-            // Other HTTP errors
-            console.error('HTTP Error:', response.status, response.statusText);
-            alert(`Server error: ${response.status} ${response.statusText}`);
+            setCheckoutError(friendly);
             return;
           }
-      
-          const data = await response.json();
+
           if (data.free && data.redirect) {
             window.location.href = data.redirect;
             return;
           }
+
           if (data.id) {
             const stripe = await stripePromise;
-            stripe.redirectToCheckout({ sessionId: data.id });
-          } else {
-            alert("Something went wrong: " + (data.error || "Unknown error"));
+            if (!stripe) {
+              setCheckoutError("We couldn't start checkout right now. Please try again.");
+              return;
+            }
+            const { error } = await stripe.redirectToCheckout({ sessionId: data.id });
+            if (error) {
+              setCheckoutError("Your payment could not be completed. Please try again.");
+            }
+            return;
           }
+
+          setCheckoutError("We couldn't start checkout right now. Please try again.");
         } catch (error) {
           console.error("Checkout error:", error);
-          if (error.name === 'SyntaxError') {
-            alert("Server returned invalid response. Please refresh the page and try again.");
-            window.location.reload();
-          } else {
-            alert("Checkout failed: " + error.message);
-          }
+          setCheckoutError("We couldn't start checkout right now. Please try again.");
+        } finally {
+          setIsCheckoutLoading(false);
         }
       };     
 
@@ -192,9 +192,13 @@ const Packages = ({ packages = [], inviteMode = false, invitePackage = null }) =
     };
 
     const closeModal = () => {
+        if (isCheckoutLoading) {
+            return;
+        }
         setShowModal(false);
         setSelectedPackageId(null);
         setSelectedPaymentMethod("card");
+        setCheckoutError(null);
     };
 
     const PaymentModal = () => {
@@ -298,22 +302,46 @@ const Packages = ({ packages = [], inviteMode = false, invitePackage = null }) =
                         </div>
 
                         {selectedPaymentMethod === "card" && (
-                            <button
-                                className="btn btn-primary w-100"
-                                onClick={() => handleCheckoutRedirect(selectedPackage)}
-                                disabled={isAuthLoading || !auth.user || !auth.user.id}
-                            >
-                                {isAuthLoading ? (
-                                    <>
-                                        <i className="fas fa-spinner fa-spin me-2"></i>
-                                        Loading...
-                                    </>
-                                ) : !auth.user || !auth.user.id ? (
-                                    "Authentication Required"
-                                ) : (
-                                    "Proceed to Stripe"
+                            <>
+                                {checkoutError && (
+                                    <div
+                                        role="alert"
+                                        style={{
+                                            background: "#fef2f2",
+                                            border: "1px solid #fecaca",
+                                            color: "#991b1b",
+                                            borderRadius: "8px",
+                                            padding: "12px 14px",
+                                            marginBottom: "16px",
+                                            fontSize: "14px",
+                                            lineHeight: 1.45,
+                                        }}
+                                    >
+                                        {checkoutError}
+                                    </div>
                                 )}
-                            </button>
+                                <button
+                                    className="btn btn-primary w-100"
+                                    onClick={() => handleCheckoutRedirect(selectedPackage)}
+                                    disabled={isAuthLoading || isCheckoutLoading || !auth.user || !auth.user.id}
+                                >
+                                    {isCheckoutLoading ? (
+                                        <>
+                                            <i className="fas fa-spinner fa-spin me-2"></i>
+                                            Preparing secure checkout…
+                                        </>
+                                    ) : isAuthLoading ? (
+                                        <>
+                                            <i className="fas fa-spinner fa-spin me-2"></i>
+                                            Loading...
+                                        </>
+                                    ) : !auth.user || !auth.user.id ? (
+                                        "Authentication Required"
+                                    ) : (
+                                        "Proceed to Stripe"
+                                    )}
+                                </button>
+                            </>
                         )}
 
                         {selectedPaymentMethod === "paypal" && (

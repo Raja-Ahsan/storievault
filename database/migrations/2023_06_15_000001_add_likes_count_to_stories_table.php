@@ -11,21 +11,23 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // Check if the column already exists
-        if (!Schema::hasColumn('stories', 'likes_count')) {
+        if (! Schema::hasTable('stories')) {
+            return;
+        }
+
+        if (! Schema::hasColumn('stories', 'likes_count')) {
             Schema::table('stories', function (Blueprint $table) {
-                $table->integer('likes_count')->default(0)->after('comment_count');
+                $table->integer('likes_count')->default(0);
             });
         }
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::table('stories', function (Blueprint $table) {
-            $table->dropColumn('likes_count');
-        });
+        if (Schema::hasTable('stories') && Schema::hasColumn('stories', 'likes_count')) {
+            Schema::table('stories', function (Blueprint $table) {
+                $table->dropColumn('likes_count');
+            });
+        }
     }
 };

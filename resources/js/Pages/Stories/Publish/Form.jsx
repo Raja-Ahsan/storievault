@@ -76,10 +76,8 @@ const CheckoutForm = ({ story, character, storyText, package: packageData, final
 
   const createStripeCheckoutSession = async () => {
     try {
-      // Log the request payload for debugging
       const requestPayload = {
-        mode: 'payment', // One-time payment
-        amount: finalPrice ? Math.round(parseFloat(finalPrice) * 100) : (packageData ? Math.round(parseFloat(packageData.price) * 100) : 1900), // Convert to cents
+        mode: 'payment',
         story_title: story.title,
         story_id: story.id,
         character: character,
@@ -89,16 +87,9 @@ const CheckoutForm = ({ story, character, storyText, package: packageData, final
         rating: rating,
         cover_image: story.cover_image,
         package_id: packageData.id,
-        package_name: packageData.name,
-        package_price: packageData.price,
-        stripe_price_id: packageData?.stripe_price_id, // Add stripe price ID
         discount_applied: discountApplied,
         discount_code: discountCode,
-        final_price: finalPrice
       };
-      
-      console.log('Request payload:', requestPayload);
-      console.log('CSRF Token:', document.querySelector('meta[name="csrf-token"]')?.getAttribute("content"));
 
       const response = await fetch("/stripe/checkout", {
         method: "POST",
@@ -111,38 +102,34 @@ const CheckoutForm = ({ story, character, storyText, package: packageData, final
         body: JSON.stringify(requestPayload),
       });
 
-      console.log('Response status:', response.status);
-      console.log('Response headers:', response.headers);
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('Response error text:', errorText);
-        throw new Error(`HTTP ${response.status}: ${errorText}`);
+      let data = {};
+      try {
+        data = await response.json();
+      } catch (_) {
+        data = {};
       }
 
-      const data = await response.json();
-      console.log('Response data:', data);
-      
-      if (!data.id) {
-        throw new Error('No session ID received from server');
+      if (!response.ok || !data.id) {
+        throw new Error(data.error || "We couldn't start checkout right now. Please try again.");
       }
-      
-      // Redirect to Stripe checkout
+
       const stripe = await loadStripe(import.meta.env.VITE_STRIPE_KEY);
       if (stripe) {
         const { error } = await stripe.redirectToCheckout({
           sessionId: data.id,
         });
-        
+
         if (error) {
-          throw new Error(error.message);
+          throw new Error("Your payment could not be completed. Please try again.");
         }
       }
     } catch (error) {
       console.error('Error creating checkout session:', error);
       Swal.fire({
-        title: 'Payment Error!',
-        text: error.message || 'Failed to create payment session.',
+        title: 'Payment Error',
+        text: error.message && !String(error.message).includes('HTTP')
+          ? error.message
+          : "We couldn't start checkout right now. Please try again.",
         icon: 'error',
         confirmButtonText: 'OK',
         confirmButtonColor: '#dc3545',
