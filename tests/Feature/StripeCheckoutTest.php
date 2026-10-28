@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Exceptions\CheckoutException;
 use App\Models\Package;
 use App\Models\User;
+use App\Services\Stripe\PackageCatalogService;
 use App\Services\Stripe\StripeCheckoutService;
 use Mockery;
 use Stripe\Checkout\Session;
@@ -34,6 +35,8 @@ class StripeCheckoutTest extends TestCase
             'price_cents' => 1900,
             'interval' => 'monthly',
             'stripe_price_id' => 'price_test_standard_monthly',
+            'stripe_account_id' => 'acct_test_current',
+            'stripe_product_id' => 'prod_test_current',
             'is_active' => true,
             'is_public' => true,
             'features' => [],
@@ -46,6 +49,15 @@ class StripeCheckoutTest extends TestCase
         $this->app->instance(StripeCheckoutService::class, $mock);
 
         return $mock;
+    }
+
+    protected function mockCatalogBelongs(bool $belongs = true): Mockery\MockInterface
+    {
+        $catalog = Mockery::mock(PackageCatalogService::class);
+        $catalog->shouldReceive('belongsToCurrentAccount')->andReturn($belongs);
+        $this->app->instance(PackageCatalogService::class, $catalog);
+
+        return $catalog;
     }
 
     protected function expectCheckoutLock(Mockery\MockInterface $mock): void
@@ -97,9 +109,13 @@ class StripeCheckoutTest extends TestCase
         $user = User::factory()->create();
         $package = $this->makePackage();
 
-        $session = Session::constructFrom(['id' => 'cs_test_123']);
+        $session = Session::constructFrom([
+            'id' => 'cs_test_123',
+            'url' => 'https://checkout.stripe.com/c/pay/cs_test_123',
+        ]);
 
         $mock = $this->mockCheckoutService();
+        $this->mockCatalogBelongs(true);
         $this->expectCheckoutLock($mock);
         $mock->shouldReceive('resolveSubscriptionPackage')->once()->andReturn($package);
         $mock->shouldReceive('userHasActiveSubscription')->once()->andReturn(false);
@@ -115,7 +131,34 @@ class StripeCheckoutTest extends TestCase
             'stripe_price_id' => 'price_client_forged',
         ]);
 
-        $response->assertOk()->assertJson(['id' => 'cs_test_123']);
+        $response->assertOk()->assertJson([
+            'id' => 'cs_test_123',
+            'url' => 'https://checkout.stripe.com/c/pay/cs_test_123',
+        ]);
+    }
+
+    public function test_checkout_rejects_package_from_other_stripe_account(): void
+    {
+        $user = User::factory()->create();
+        $package = $this->makePackage([
+            'stripe_account_id' => 'acct_other',
+        ]);
+
+        $mock = $this->mockCheckoutService();
+        $this->mockCatalogBelongs(false);
+        $this->expectCheckoutLock($mock);
+        $mock->shouldReceive('resolveSubscriptionPackage')->once()->andReturn($package);
+        $mock->shouldReceive('createSubscriptionCheckoutSession')->never();
+
+        $response = $this->actingAs($user)->postJson('/stripe/checkout', [
+            'package_id' => $package->id,
+        ]);
+
+        $response->assertStatus(422);
+        $response->assertJson([
+            'error' => "We couldn't start checkout right now. Please try again.",
+        ]);
+        $this->assertStringNotContainsString('acct_other', $response->getContent());
     }
 
     public function test_stripe_api_failure_returns_friendly_error_without_internals(): void
@@ -124,6 +167,7 @@ class StripeCheckoutTest extends TestCase
         $package = $this->makePackage();
 
         $mock = $this->mockCheckoutService();
+        $this->mockCatalogBelongs(true);
         $this->expectCheckoutLock($mock);
         $mock->shouldReceive('resolveSubscriptionPackage')->once()->andReturn($package);
         $mock->shouldReceive('userHasActiveSubscription')->once()->andReturn(false);
@@ -176,6 +220,7 @@ class StripeCheckoutTest extends TestCase
         $package = $this->makePackage();
 
         $mock = $this->mockCheckoutService();
+        $this->mockCatalogBelongs(true);
         $this->expectCheckoutLock($mock);
         $mock->shouldReceive('resolveSubscriptionPackage')->once()->andReturn($package);
         $mock->shouldReceive('userHasActiveSubscription')->once()->andReturn(true);
@@ -217,6 +262,7 @@ class StripeCheckoutTest extends TestCase
         $package = $this->makePackage();
 
         $mock = $this->mockCheckoutService();
+        $this->mockCatalogBelongs(true);
         $this->expectCheckoutLock($mock);
         $mock->shouldReceive('resolveSubscriptionPackage')->once()->andReturn($package);
         $mock->shouldReceive('userHasActiveSubscription')->once()->andReturn(false);
@@ -248,6 +294,7 @@ class StripeCheckoutTest extends TestCase
         ]);
 
         $mock = $this->mockCheckoutService();
+        $this->mockCatalogBelongs(true);
         $this->expectCheckoutLock($mock);
         $mock->shouldReceive('resolveSubscriptionPackage')->once()->andReturn($package);
         $mock->shouldReceive('userHasActiveSubscription')->once()->andReturn(false);
@@ -269,9 +316,13 @@ class StripeCheckoutTest extends TestCase
         $user = User::factory()->create();
         $package = $this->makePackage(['stripe_price_id' => 'price_authoritative']);
 
-        $session = Session::constructFrom(['id' => 'cs_test_auth']);
+        $session = Session::constructFrom([
+            'id' => 'cs_test_auth',
+            'url' => 'https://checkout.stripe.com/c/pay/cs_test_auth',
+        ]);
 
         $mock = $this->mockCheckoutService();
+        $this->mockCatalogBelongs(true);
         $this->expectCheckoutLock($mock);
         $mock->shouldReceive('resolveSubscriptionPackage')
             ->once()
@@ -290,6 +341,9 @@ class StripeCheckoutTest extends TestCase
             'package_id' => $package->id,
             'stripe_price_id' => 'price_forged_by_client',
             'amount' => 100,
-        ])->assertOk()->assertJson(['id' => 'cs_test_auth']);
+        ])->assertOk()->assertJson([
+            'id' => 'cs_test_auth',
+            'url' => 'https://checkout.stripe.com/c/pay/cs_test_auth',
+        ]);
     }
 }

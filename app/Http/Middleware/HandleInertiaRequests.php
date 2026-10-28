@@ -37,6 +37,9 @@ class HandleInertiaRequests extends Middleware
                 'error' => fn () => $request->session()->get('error'),
                 'newsletter_success' => fn () => $request->session()->get('newsletter_success'),
             ],
+            // Publishable key from Laravel config (same account as STRIPE_SECRET).
+            // Prefer this over Vite-baked VITE_STRIPE_KEY, which goes stale when keys change.
+            'stripe_key' => config('services.stripe.key'),
             'auth' => [
                 'user' => $request->user() ? [
                     'id' => $request->user()->id,

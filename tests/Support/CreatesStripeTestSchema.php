@@ -42,6 +42,8 @@ trait CreatesStripeTestSchema
             $table->string('interval')->nullable();
             $table->json('features')->nullable();
             $table->string('stripe_price_id')->nullable();
+            $table->string('stripe_account_id')->nullable()->index();
+            $table->string('stripe_product_id')->nullable()->index();
             $table->boolean('is_active')->default(true);
             $table->boolean('is_public')->default(true);
             $table->string('invite_token', 64)->nullable();

@@ -115,27 +115,12 @@ Route::middleware(['auth', 'subscription'])->group(function () {
     Route::post('/community/store', [StoriesController::class, 'storeCommunity'])->name('community.store');
 });
 
-// Packages route - accessible without login (public packages only)
-Route::get('/packages', function () {
-    $packages = \App\Models\Package::publiclyListed()->get();
-    return Inertia::render('Packages', [
-        'packages' => $packages,
-        'inviteMode' => false,
-    ]);
-})->name('packages');
+// Packages route - accessible without login (only packages valid for current Stripe account)
+Route::get('/packages', [\App\Http\Controllers\PackagesController::class, 'index'])->name('packages');
 
 // Private invite link for hidden packages (e.g. Free) — share with specific people
-Route::get('/packages/invite/{token}', function (string $token) {
-    $package = \App\Models\Package::where('invite_token', $token)
-        ->where('is_active', true)
-        ->firstOrFail();
-
-    return Inertia::render('Packages', [
-        'packages' => collect([$package]),
-        'inviteMode' => true,
-        'invitePackage' => $package,
-    ]);
-})->name('packages.invite');
+Route::get('/packages/invite/{token}', [\App\Http\Controllers\PackagesController::class, 'invite'])
+    ->name('packages.invite');
 
 Route::post('/newsletter/subscribe', [\App\Http\Controllers\NewsletterController::class, 'subscribe'])
     ->name('newsletter.subscribe');

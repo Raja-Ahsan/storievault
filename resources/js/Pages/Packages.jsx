@@ -11,10 +11,9 @@ import {
 import { loadStripe } from "@stripe/stripe-js";
 import CheckoutForm from "@/Components/CheckoutForm";
 
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_KEY);
-
 const Packages = ({ packages = [], inviteMode = false, invitePackage = null }) => {
-    const { auth } = usePage().props;
+    const { auth, stripe_key: stripeKeyFromServer } = usePage().props;
+    const publishableKey = stripeKeyFromServer || import.meta.env.VITE_STRIPE_KEY;
     const [selectedPackageId, setSelectedPackageId] = useState(null);
     const [showModal, setShowModal] = useState(false);
     const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("card");
@@ -148,8 +147,19 @@ const Packages = ({ packages = [], inviteMode = false, invitePackage = null }) =
             return;
           }
 
+          if (data.url) {
+            window.location.href = data.url;
+            return;
+          }
+
+          // Fallback for older responses: redirect via Stripe.js using the
+          // server-provided publishable key (same account as STRIPE_SECRET).
           if (data.id) {
-            const stripe = await stripePromise;
+            if (!publishableKey || String(publishableKey).includes('${')) {
+              setCheckoutError("Stripe is not configured correctly. Please contact support.");
+              return;
+            }
+            const stripe = await loadStripe(publishableKey);
             if (!stripe) {
               setCheckoutError("We couldn't start checkout right now. Please try again.");
               return;

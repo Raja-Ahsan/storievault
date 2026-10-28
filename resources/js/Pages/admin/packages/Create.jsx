@@ -28,7 +28,7 @@ const themeColors = {
 };
 
 const Create = ({ flash }) => {
-    const { data, setData, post, processing, errors, reset } = useForm({
+    const { data, setData, post, processing, errors, reset, transform } = useForm({
         name: "",
         badge: "",
         price_cents: "",
@@ -56,7 +56,15 @@ const Create = ({ flash }) => {
                 }
             });
         }
-    }, [flash?.success]);
+        if (flash?.error) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Could not create package',
+                text: flash.error,
+                confirmButtonColor: themeColors.primary,
+            });
+        }
+    }, [flash?.success, flash?.error]);
 
     // Warn user about unsaved changes
     useEffect(() => {
@@ -145,24 +153,35 @@ const Create = ({ flash }) => {
             }
         });
 
-        // Filter out empty features
         const featuresArray = data.features.filter((f) => f && f.trim());
 
-        // Update the form data with filtered features and other formatted data
-        setData("features", featuresArray);
-        setData("name", data.name.trim());
-        setData("is_active", data.is_active === "1");
+        transform((form) => ({
+            ...form,
+            name: (form.name || "").trim(),
+            features: featuresArray,
+            is_active: form.is_active === "1" || form.is_active === true,
+        }));
 
         post(route("admin-dashboard.packages.store"), {
             preserveScroll: true,
-            onSuccess: () => {
+            onSuccess: (page) => {
+                if (page?.url?.includes("/packages/create") || page?.props?.flash?.error) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Could not create package',
+                        text: page?.props?.flash?.error || 'Stripe rejected the package. Check your live keys and try again.',
+                        confirmButtonColor: themeColors.primary,
+                    });
+                    return;
+                }
+
                 reset();
                 Swal.fire({
                     icon: 'success',
                     title: 'Package created successfully!',
-                    text: 'Redirecting to packages list...',
+                    text: 'Opening packages list...',
                     showConfirmButton: false,
-                    timer: 1500,
+                    timer: 1200,
                     confirmButtonColor: themeColors.primary,
                     background: '#fff',
                     customClass: {
@@ -172,16 +191,16 @@ const Create = ({ flash }) => {
                     }
                 });
             },
-            onError: (errors) => {
-                // Show specific error messages
+            onError: (formErrors) => {
                 let errorMessage = 'Please check your input.';
-                if (errors.name) errorMessage = errors.name;
-                else if (errors.price_cents) errorMessage = errors.price_cents;
-                else if (errors.interval) errorMessage = errors.interval;
-                else if (errors.words_limit) errorMessage = errors.words_limit;
-                else if (errors.stories_limit) errorMessage = errors.stories_limit;
-                else if (errors.features) errorMessage = errors.features;
-                
+                if (formErrors.stripe) errorMessage = formErrors.stripe;
+                else if (formErrors.name) errorMessage = formErrors.name;
+                else if (formErrors.price_cents) errorMessage = formErrors.price_cents;
+                else if (formErrors.interval) errorMessage = formErrors.interval;
+                else if (formErrors.words_limit) errorMessage = formErrors.words_limit;
+                else if (formErrors.stories_limit) errorMessage = formErrors.stories_limit;
+                else if (formErrors.features) errorMessage = formErrors.features;
+
                 Swal.fire({
                     icon: 'error',
                     title: 'Error creating package!',

@@ -16,6 +16,8 @@ class Package extends Model
         'interval',
         'features',
         'stripe_price_id',
+        'stripe_account_id',
+        'stripe_product_id',
         'is_active',
         'is_public',
         'invite_token',
@@ -46,6 +48,14 @@ class Package extends Model
     public function scopePubliclyListed($query)
     {
         return $query->where('is_active', true)->where('is_public', true);
+    }
+
+    /**
+     * Packages created under a specific Stripe account (acct_…).
+     */
+    public function scopeForStripeAccount($query, string $accountId)
+    {
+        return $query->where('stripe_account_id', $accountId);
     }
 
     public function inviteUrl(): ?string

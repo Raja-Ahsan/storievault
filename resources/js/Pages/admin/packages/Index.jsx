@@ -21,7 +21,7 @@ import {
     CButton
 } from '@coreui/react';
 
-function Index({ packages, flash }) {
+function Index({ packages, flash, stripe_account_id = null }) {
     // Handle flash messages with SweetAlert
     useEffect(() => {
         if (flash?.success) {
@@ -116,7 +116,19 @@ function Index({ packages, flash }) {
                 <CCol xs={12}>
                     <CCard className="mb-4">
                         <CCardHeader className="d-flex justify-content-between align-items-center">
-                            <strong>Packages</strong>
+                            <div>
+                                <strong>Packages</strong>
+                                {stripe_account_id && (
+                                    <div className="small text-muted mt-1">
+                                        Showing packages for Stripe account <code>{stripe_account_id}</code>
+                                    </div>
+                                )}
+                                {!stripe_account_id && (
+                                    <div className="small text-danger mt-1">
+                                        Stripe account could not be verified. Check your API keys.
+                                    </div>
+                                )}
+                            </div>
                             <Link href={route('admin-dashboard.packages.create')}>
                                 <CButton color="primary" size="sm" style={{ backgroundColor: '#fea257', borderColor: '#fea257' }}>
                                     <Icons.Plus className="me-1" /> Create Package
@@ -125,6 +137,20 @@ function Index({ packages, flash }) {
                         </CCardHeader>
 
                         <CCardBody>
+                            {(!packages.data || packages.data.length === 0) && (
+                                <div className="text-center py-5 mb-3 border rounded bg-light">
+                                    <h5 className="mb-2">No packages for this Stripe account</h5>
+                                    <p className="text-muted mb-3 mb-0">
+                                        Packages from other Stripe accounts stay in the database but are hidden here.
+                                        Create a new package to sync it with the currently configured Stripe keys.
+                                    </p>
+                                    <Link href={route('admin-dashboard.packages.create')}>
+                                        <CButton color="primary" size="sm" style={{ backgroundColor: '#fea257', borderColor: '#fea257' }}>
+                                            <Icons.Plus className="me-1" /> Create Package
+                                        </CButton>
+                                    </Link>
+                                </div>
+                            )}
                             <CTable hover responsive>
                                 <CTableHead>
                                     <CTableRow>
@@ -155,11 +181,16 @@ function Index({ packages, flash }) {
                                                     )}
                                                 </CTableDataCell>
                                                 <CTableDataCell>
-                                                    <div className="mt-1">
+                                                    <div className="mt-1 d-flex flex-column gap-1">
                                                         {pkg.is_active ? (
                                                             <CBadge color="success">Active</CBadge>
                                                         ) : (
                                                             <CBadge color="secondary">Inactive</CBadge>
+                                                        )}
+                                                        {pkg.stripe_account_id && (
+                                                            <CBadge color="info" title={pkg.stripe_account_id}>
+                                                                Current account
+                                                            </CBadge>
                                                         )}
                                                     </div>
                                                 </CTableDataCell>

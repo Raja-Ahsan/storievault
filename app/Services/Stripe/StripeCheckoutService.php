@@ -114,6 +114,100 @@ class StripeCheckoutService
     }
 
     /**
+     * Non-throwing check used by the public catalog: does this Price exist
+     * and belong to the currently configured Stripe account/mode?
+     */
+    public function isPriceAvailableForCurrentAccount(string $priceId): bool
+    {
+        $cacheKey = $this->priceAvailabilityCacheKey($priceId);
+
+        return (bool) Cache::remember($cacheKey, now()->addMinutes(10), function () use ($priceId) {
+            try {
+                $this->assertPricePurchasable($priceId, 'catalog filter');
+
+                return true;
+            } catch (CheckoutException $e) {
+                Log::info('Package catalog excluding Stripe price', [
+                    'price_id' => $priceId,
+                    'reason' => $e->logContext(),
+                ]);
+
+                return false;
+            } catch (\Throwable $e) {
+                Log::warning('Package catalog Stripe check failed', [
+                    'price_id' => $priceId,
+                    'message' => $e->getMessage(),
+                ]);
+
+                return false;
+            }
+        });
+    }
+
+    public function forgetPriceAvailabilityCache(?string $priceId = null): void
+    {
+        if ($priceId) {
+            Cache::forget($this->priceAvailabilityCacheKey($priceId));
+
+            return;
+        }
+
+        // Best-effort: key fingerprint change already isolates cache per Stripe account.
+    }
+
+    protected function priceAvailabilityCacheKey(string $priceId): string
+    {
+        $secret = (string) config('services.stripe.secret');
+        $fingerprint = substr(hash('sha256', $secret), 0, 16);
+
+        return "stripe_price_ok:{$fingerprint}:{$priceId}";
+    }
+
+    /**
+     * Ensure the package was created under the currently configured Stripe account.
+     */
+    public function assertPackageBelongsToCurrentAccount(Package $package): void
+    {
+        $accountId = app(StripeAccountService::class)->currentAccountId();
+
+        if (! $accountId) {
+            throw new CheckoutException(
+                "We couldn't start checkout right now. Please try again.",
+                'Unable to resolve current Stripe account for package #'.$package->id,
+                503
+            );
+        }
+
+        if (! empty($package->stripe_account_id)
+            && ! hash_equals((string) $package->stripe_account_id, (string) $accountId)) {
+            throw new CheckoutException(
+                "We couldn't start checkout right now. Please try again.",
+                "Package #{$package->id} belongs to Stripe account {$package->stripe_account_id}, current is {$accountId}",
+                422
+            );
+        }
+
+        // Legacy unstamped rows: require a live Price that resolves on this account, then stamp.
+        if (empty($package->stripe_account_id)) {
+            if ((int) ($package->price_cents ?? 0) === 0) {
+                $package->forceFill(['stripe_account_id' => $accountId])->save();
+
+                return;
+            }
+
+            $meta = $this->assertPricePurchasable(
+                (string) ($package->stripe_price_id ?? ''),
+                "subscription package #{$package->id}"
+            );
+
+            $package->forceFill([
+                'stripe_account_id' => $accountId,
+                'stripe_product_id' => $meta['product_id'] ?? $package->stripe_product_id,
+            ])->save();
+        }
+    }
+
+    /**
      * Validate that a Stripe Price is purchasable with the current API keys.
      *
      * @return array{price_id: string, product_id: string, livemode: bool}
@@ -230,15 +324,34 @@ class StripeCheckoutService
      */
     public function createSubscriptionCheckoutSession(User $user, Package $package): Session
     {
-        if ((int) ($package->price_cents ?? 0) === 0 || empty($package->stripe_price_id)) {
+        if ((int) ($package->price_cents ?? 0) === 0) {
             throw new CheckoutException(
                 "We couldn't start checkout right now. Please try again.",
-                "Package #{$package->id} is free or missing stripe_price_id; use free activation path",
+                "Package #{$package->id} is free; use free activation path",
                 422
             );
         }
 
-        $this->assertPricePurchasable($package->stripe_price_id, "subscription package #{$package->id}");
+        if (empty($package->stripe_price_id) || ! str_starts_with((string) $package->stripe_price_id, 'price_')) {
+            throw new CheckoutException(
+                "We couldn't start checkout right now. Please try again.",
+                "Package #{$package->id} is missing a valid stripe_price_id",
+                422
+            );
+        }
+
+        $this->assertPackageBelongsToCurrentAccount($package);
+        $meta = $this->assertPricePurchasable($package->stripe_price_id, "subscription package #{$package->id}");
+
+        if (! empty($package->stripe_product_id)
+            && ! hash_equals((string) $package->stripe_product_id, (string) $meta['product_id'])) {
+            throw new CheckoutException(
+                "We couldn't start checkout right now. Please try again.",
+                "Package #{$package->id} product mismatch: stored {$package->stripe_product_id}, live {$meta['product_id']}",
+                422
+            );
+        }
+
         $customerId = $this->ensureCustomer($user);
         $domain = rtrim((string) config('app.url'), '/');
 

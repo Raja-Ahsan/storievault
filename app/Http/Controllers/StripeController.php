@@ -8,6 +8,7 @@ use App\Models\Package;
 use App\Models\Payment;
 use App\Models\PublishRequest;
 use App\Models\Subscription;
+use App\Services\Stripe\PackageCatalogService;
 use App\Services\Stripe\StripeCheckoutService;
 use Carbon\Carbon;
 use Exception;
@@ -19,8 +20,10 @@ use Inertia\Inertia;
 
 class StripeController extends Controller
 {
-    public function __construct(protected StripeCheckoutService $checkout)
-    {
+    public function __construct(
+        protected StripeCheckoutService $checkout,
+        protected PackageCatalogService $catalog,
+    ) {
     }
 
     public function createCheckoutSession(Request $request)
@@ -75,8 +78,17 @@ class StripeController extends Controller
 
         $package = $this->checkout->resolveSubscriptionPackage((int) $validated['package_id']);
 
-        // Free / $0 packages: activate locally (invite link flow)
-        if ((int) ($package->price_cents ?? 0) === 0 || empty($package->stripe_price_id)) {
+        if (! $this->catalog->belongsToCurrentAccount($package)) {
+            throw new CheckoutException(
+                "We couldn't start checkout right now. Please try again.",
+                "Checkout blocked: package #{$package->id} is not on the current Stripe account",
+                422
+            );
+        }
+
+        // Free / $0 packages only: activate locally (invite link flow).
+        // Paid packages missing a Price ID must never take this path.
+        if ((int) ($package->price_cents ?? 0) === 0) {
             if ($this->checkout->userHasActiveSubscription($user)) {
                 return response()->json([
                     'error' => 'You already have an active subscription.',
@@ -113,7 +125,12 @@ class StripeController extends Controller
         // Never trust browser-sent amount / stripe_price_id
         $session = $this->checkout->createSubscriptionCheckoutSession($user, $package);
 
-        return response()->json(['id' => $session->id]);
+        // Prefer hosted Checkout URL so the browser never depends on a Vite-baked
+        // publishable key matching the secret used to create the session.
+        return response()->json([
+            'id' => $session->id,
+            'url' => $session->url,
+        ]);
     }
 
     protected function createPublishCheckout(Request $request, $user)
@@ -178,7 +195,10 @@ class StripeController extends Controller
         $override = $discountApplied ? $amountCents : null;
         $session = $this->checkout->createPublishCheckoutSession($user, $package, $metadata, $override);
 
-        return response()->json(['id' => $session->id]);
+        return response()->json([
+            'id' => $session->id,
+            'url' => $session->url,
+        ]);
     }
 
     /**

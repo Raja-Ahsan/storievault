@@ -8,11 +8,11 @@ import Swal from 'sweetalert2';
 import { Icons } from '@/utils/icons';
 import { onCoverImageError } from '@/utils/imageFallback';
 
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_KEY);
-
 const CheckoutForm = ({ story, character, storyText, package: packageData, finalPrice, discountApplied, discountCode, discountAmount, originalPrice, rating }) => {
   const stripe = useStripe();
   const elements = useElements();
+  const { stripe_key: stripeKeyFromServer } = usePage().props;
+  const publishableKey = stripeKeyFromServer || import.meta.env.VITE_STRIPE_KEY;
   const [clientSecret, setClientSecret] = useState('');
   const [loading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
@@ -109,11 +109,16 @@ const CheckoutForm = ({ story, character, storyText, package: packageData, final
         data = {};
       }
 
-      if (!response.ok || !data.id) {
+      if (!response.ok || (!data.url && !data.id)) {
         throw new Error(data.error || "We couldn't start checkout right now. Please try again.");
       }
 
-      const stripe = await loadStripe(import.meta.env.VITE_STRIPE_KEY);
+      if (data.url) {
+        window.location.href = data.url;
+        return;
+      }
+
+      const stripe = await loadStripe(publishableKey);
       if (stripe) {
         const { error } = await stripe.redirectToCheckout({
           sessionId: data.id,
@@ -264,7 +269,11 @@ const CheckoutForm = ({ story, character, storyText, package: packageData, final
 };
 
 const Form = ({ prefill, story, package: packageData, ratings = [] }) => {
-  const { auth } = usePage().props;
+  const { auth, stripe_key: stripeKeyFromServer } = usePage().props;
+  const publishableKey = stripeKeyFromServer || import.meta.env.VITE_STRIPE_KEY;
+  const stripePromise = publishableKey && !String(publishableKey).includes('${')
+    ? loadStripe(publishableKey)
+    : null;
   
   // Function to strip HTML tags and clean up text
   const stripHtmlTags = (html) => {
