@@ -49,8 +49,6 @@ const Index = ({ subscriptions, stats, filters }) => {
   }
 
   const handleToggleRenewal = async (subscriptionId, currentState) => {
-    const newState = !currentState;
-
     // Show loading toast
     const loadingToast = Swal.mixin({
       toast: true,
@@ -74,10 +72,13 @@ const Index = ({ subscriptions, stats, filters }) => {
       Swal.close();
       
       if (response.data.success) {
-        // Update the toggle state
+        const enabled = typeof response.data.auto_renewal === 'boolean'
+          ? response.data.auto_renewal
+          : !response.data.cancel_at_period_end;
+
         setToggleStates(prev => ({
           ...prev,
-          [subscriptionId]: newState
+          [subscriptionId]: enabled
         }));
         
         // Show success toast
@@ -129,7 +130,7 @@ const Index = ({ subscriptions, stats, filters }) => {
     if (toggleStates.hasOwnProperty(subscription.id)) {
       return toggleStates[subscription.id];
     }
-    // Default state based on cancel_at_period_end
+    // cancel_at_period_end true/1 => renewal OFF; 0/false/null => renewal ON
     return !subscription.cancel_at_period_end;
   };
 

@@ -10,17 +10,9 @@ const UserDashboard = () => {
   const { user, metrics } = usePage().props;
   // const { user, metrics } = usePage().props
   
-  // State for toggle switch
-  // When cancelAtPeriodEnd is true, auto-renewal is disabled, so toggle should be false
-  // When cancelAtPeriodEnd is false/undefined, auto-renewal is enabled, so toggle should be true
-  const [isAutoRenewalEnabled, setIsAutoRenewalEnabled] = useState(metrics?.cancelAtPeriodEnd === false);
-  
-  // Debug logging to understand the toggle state
-  console.log('Toggle Debug:', {
-    cancelAtPeriodEnd: metrics?.cancelAtPeriodEnd,
-    isAutoRenewalEnabled: isAutoRenewalEnabled,
-    subscriptionStatus: metrics?.subscriptionStatus
-  });
+  // cancel_at_period_end=true means Stripe will NOT renew → toggle OFF
+  // Treat 0/false/null/undefined as renewal enabled (toggle ON)
+  const [isAutoRenewalEnabled, setIsAutoRenewalEnabled] = useState(!metrics?.cancelAtPeriodEnd);
 
   // Helper function to get subscription status styling
   const getSubscriptionStatusStyle = (status) => {
@@ -76,9 +68,6 @@ const UserDashboard = () => {
       return;
     }
 
-    // Get current toggle state
-    const newState = !isAutoRenewalEnabled;
-
     // Show loading toast
     const loadingToast = Swal.mixin({
       toast: true,
@@ -102,8 +91,11 @@ const UserDashboard = () => {
       Swal.close();
       
       if (response.data.success) {
-        // Update the toggle state
-        setIsAutoRenewalEnabled(newState);
+        // Trust server state — never guess from local flip
+        const enabled = typeof response.data.auto_renewal === 'boolean'
+          ? response.data.auto_renewal
+          : !response.data.cancel_at_period_end;
+        setIsAutoRenewalEnabled(enabled);
         
         // Show success toast
         const Toast = Swal.mixin({

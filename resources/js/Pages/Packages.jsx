@@ -254,12 +254,29 @@ const Packages = ({ packages = [], inviteMode = false, invitePackage = null }) =
                         >
                             <h4>{selectedPackage?.name}</h4>
                             <p className="price">
-                                {selectedPackage?.price_cents
-                                    ? `$${(selectedPackage.price_cents / 100).toFixed(2)}`
-                                    : "Free"}
+                                {selectedPackage?.discount_active ? (
+                                    <>
+                                        <span style={{ textDecoration: 'line-through', opacity: 0.65, marginRight: 8 }}>
+                                            ${((selectedPackage.price_cents || 0) / 100).toFixed(2)}
+                                        </span>
+                                        <strong>
+                                            ${((selectedPackage.display_price_cents ?? selectedPackage.price_cents) / 100).toFixed(2)}
+                                        </strong>
+                                    </>
+                                ) : (
+                                    selectedPackage?.price_cents
+                                        ? `$${(selectedPackage.price_cents / 100).toFixed(2)}`
+                                        : "Free"
+                                )}
                                 {selectedPackage?.interval &&
                                     ` / ${selectedPackage.interval}`}
                             </p>
+                            {selectedPackage?.discount_badge && (
+                                <span className="badge bg-danger">{selectedPackage.discount_badge}</span>
+                            )}
+                            {selectedPackage?.renewal_note && (
+                                <p className="small text-muted mb-0 mt-1">{selectedPackage.renewal_note}</p>
+                            )}
                         </div>
 
                         {/* Payment Method Selection */}
@@ -447,13 +464,24 @@ const Packages = ({ packages = [], inviteMode = false, invitePackage = null }) =
             }
         }
 
+        const hasDiscount = !!pkg.discount_active;
+        const originalCents = pkg.price_cents || 0;
+        const displayCents = hasDiscount
+            ? (pkg.display_price_cents ?? originalCents)
+            : originalCents;
+
         return {
             id: pkg.id,
             badge: pkg.badge,
             title: pkg.name,
-            price: pkg.price_cents
-                ? `$${(pkg.price_cents / 100).toFixed(2)}`
+            price: originalCents
+                ? `$${(displayCents / 100).toFixed(2)}`
                 : "$0",
+            originalPrice: hasDiscount && originalCents
+                ? `$${(originalCents / 100).toFixed(2)}`
+                : null,
+            discountBadge: pkg.discount_badge || null,
+            renewalNote: pkg.renewal_note || null,
             monthlyAnualy: pkg.interval || null,
             words_limit: pkg.words_limit || 0,
             stories_limit: pkg.stories_limit || 0,
@@ -462,6 +490,7 @@ const Packages = ({ packages = [], inviteMode = false, invitePackage = null }) =
             ctaText: "Get Started Now",
             ctaLink: "/register",
             isPopular: index === 1 || index === 2, // Make 2nd and 3rd packages popular
+            raw: pkg,
         };
     });
 
@@ -691,12 +720,19 @@ const Packages = ({ packages = [], inviteMode = false, invitePackage = null }) =
                             transformedPackages.map((packageItem) => (
                                 <div key={packageItem.id} className="col-md-4">
                                     <div className="publish-card package-card">
-                                        {/* Package Badge */}
-                                        {packageItem.badge && 
-                                        <div className="package-badge">
-                                            {packageItem.badge}
-                                        </div>
-                                        }
+                                        {/* Discount badge — top left */}
+                                        {packageItem.discountBadge && (
+                                            <div className="package-discount-badge">
+                                                {packageItem.discountBadge}
+                                            </div>
+                                        )}
+
+                                        {/* Package badge — top right when discount takes left */}
+                                        {packageItem.badge && (
+                                            <div className={`package-badge${packageItem.discountBadge ? ' package-badge--right' : ''}`}>
+                                                {packageItem.badge}
+                                            </div>
+                                        )}
 
                                         {/* Package Icon */}
                                         <div className="package-icon">
@@ -711,6 +747,18 @@ const Packages = ({ packages = [], inviteMode = false, invitePackage = null }) =
                                         {/* Price */}
                                         <div className="mb-30">
                                             <span className="package-price">
+                                                {packageItem.originalPrice && (
+                                                    <span
+                                                        className="me-2"
+                                                        style={{
+                                                            textDecoration: 'line-through',
+                                                            opacity: 0.55,
+                                                            fontSize: '27px',
+                                                        }}
+                                                    >
+                                                        {packageItem.originalPrice}
+                                                    </span>
+                                                )}
                                                 {packageItem.price}{" "}
                                                 {packageItem.monthlyAnualy ? (
                                                     <span className="monthly-anualy">
@@ -723,6 +771,11 @@ const Packages = ({ packages = [], inviteMode = false, invitePackage = null }) =
                                                     ""
                                                 )}
                                             </span>
+                                            {packageItem.renewalNote && (
+                                                <div className="small text-muted mt-2">
+                                                    {packageItem.renewalNote}
+                                                </div>
+                                            )}
                                         </div>
 
                                         {/* Features List */}

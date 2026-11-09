@@ -1106,16 +1106,42 @@ span.fs-54 {
 
 .package-badge {
     position: absolute;
-    top: 20px;
-    right: 20px;
+    top: 16px;
+    left: 16px;
+    right: auto;
     background: linear-gradient(45deg, #fea257, #ff8c42);
     color: white;
-    padding: 8px 16px;
-    border-radius: 20px;
-    font-size: 14px;
-    font-weight: 600;
+    padding: 10px 18px;
+    border-radius: 22px;
+    font-size: 15px;
+    font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 1px;
+    line-height: 1.2;
+    z-index: 2;
+    box-shadow: 0 4px 12px rgba(254, 162, 87, 0.35);
+}
+
+.package-badge.package-badge--right {
+    left: auto;
+    right: 16px;
+}
+
+.package-discount-badge {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    background: #dc3545;
+    color: #fff;
+    padding: 10px 16px;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    line-height: 1.2;
+    z-index: 3;
+    box-shadow: 0 4px 14px rgba(220, 53, 69, 0.4);
 }
 
 .package-icon {

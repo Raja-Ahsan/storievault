@@ -146,13 +146,32 @@ const Show = ({ package: pkg, flash }) => {
                 <div className="text-medium-emphasis mb-3">
                   {pkg.price_cents !== null ? `$${(pkg.price_cents / 100).toFixed(2)}` : 'Free'} • {pkg.interval || 'N/A'} • Created {formatDate(pkg.created_at)}
                 </div>
-                <CBadge color={pkg.is_active ? 'success' : 'secondary'} className="mb-3">
-                  {pkg.is_active ? 'Active Package' : 'Inactive Package'}
-                </CBadge>
+                <div className="d-flex gap-2 mb-3 flex-wrap">
+                  <CBadge color={pkg.is_active ? 'success' : 'secondary'}>
+                    {pkg.is_active ? 'Active Package' : 'Inactive Package'}
+                  </CBadge>
+                  {pkg.discount_active && pkg.discount_badge && (
+                    <CBadge color="danger">{pkg.discount_badge}</CBadge>
+                  )}
+                </div>
                 <div className="d-flex gap-3 mb-4">
                   <div className="text-center">
-                    <div className="fs-4 fw-bold">{pkg.price_cents !== null ? `$${(pkg.price_cents / 100).toFixed(2)}` : 'Free'}</div>
+                    <div className="fs-4 fw-bold">
+                      {pkg.discount_active ? (
+                        <>
+                          <span className="text-decoration-line-through text-medium-emphasis fs-6 me-2">
+                            ${((pkg.price_cents || 0) / 100).toFixed(2)}
+                          </span>
+                          ${((pkg.display_price_cents ?? pkg.price_cents) / 100).toFixed(2)}
+                        </>
+                      ) : (
+                        pkg.price_cents !== null ? `$${(pkg.price_cents / 100).toFixed(2)}` : 'Free'
+                      )}
+                    </div>
                     <div className="text-medium-emphasis">Price</div>
+                    {pkg.renewal_note && (
+                      <div className="small text-medium-emphasis mt-1">{pkg.renewal_note}</div>
+                    )}
                   </div>
                   <div className="text-center">
                     <div className="fs-4 fw-bold">{pkg.interval || 'N/A'}</div>

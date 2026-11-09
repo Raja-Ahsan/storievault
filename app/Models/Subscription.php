@@ -21,6 +21,12 @@ class Subscription extends Model
         'cancel_at_period_end',
     ];
 
+    protected $casts = [
+        'cancel_at_period_end' => 'boolean',
+        'trial_ends_at' => 'datetime',
+        'ends_at' => 'datetime',
+    ];
+
     public function user()
     {
         return $this->belongsTo(User::class);

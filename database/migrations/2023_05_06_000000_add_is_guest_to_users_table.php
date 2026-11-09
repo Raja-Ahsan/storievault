@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // Schema::table('users', function (Blueprint $table) {
-        //     $table->boolean('is_guest')->default(false)->after('remember_token');
-        // });
+        if (! Schema::hasColumn('users', 'is_guest')) {
+            Schema::table('users', function (Blueprint $table) {
+                $table->boolean('is_guest')->default(false)->after('remember_token');
+            });
+        }
     }
 
     /**
@@ -21,8 +23,10 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn('is_guest');
-        });
+        if (Schema::hasColumn('users', 'is_guest')) {
+            Schema::table('users', function (Blueprint $table) {
+                $table->dropColumn('is_guest');
+            });
+        }
     }
 };

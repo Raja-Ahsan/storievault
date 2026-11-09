@@ -210,8 +210,10 @@ class SubscriptionController extends Controller
                 ], 403);
             }
 
-            // Stripe client init
-            $stripe = new StripeClient(config('services.stripe.secret'));
+            // Prefer container binding so tests can mock StripeClient
+            $stripe = app()->bound(StripeClient::class)
+                ? app(StripeClient::class)
+                : new StripeClient(config('services.stripe.secret'));
 
             // Fetch current subscription from Stripe
             $stripeSub = $stripe->subscriptions->retrieve($subscription->stripe_id);
@@ -232,16 +234,20 @@ class SubscriptionController extends Controller
 
             // Update local DB
             $subscription->update([
-                'cancel_at_period_end' => $updatedSub->cancel_at_period_end,
+                'cancel_at_period_end' => (bool) $updatedSub->cancel_at_period_end,
                 'ends_at' => $updatedSub->cancel_at ? \Carbon\Carbon::createFromTimestamp($updatedSub->cancel_at) : null,
             ]);
 
+            $autoRenewalEnabled = ! (bool) $updatedSub->cancel_at_period_end;
+
             return response()->json([
                 'success' => true,
-                'message' => $newValue
-                    ? 'Auto-renewal disabled, subscription will end at period end.'
-                    : 'Auto-renewal enabled, subscription will continue.',
-                'subscription' => $subscription
+                'message' => $autoRenewalEnabled
+                    ? 'Auto-renewal enabled, subscription will continue.'
+                    : 'Auto-renewal disabled, subscription will end at period end.',
+                'auto_renewal' => $autoRenewalEnabled,
+                'cancel_at_period_end' => (bool) $updatedSub->cancel_at_period_end,
+                'subscription' => $subscription->fresh(),
             ]);
         } catch (\Exception $e) {
             Log::error('Toggle renewal failed: ' . $e->getMessage());

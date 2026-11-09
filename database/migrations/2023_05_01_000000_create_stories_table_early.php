@@ -18,6 +18,7 @@ return new class extends Migration
 
         Schema::create('stories', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
             $table->string('title');
             $table->text('description')->nullable();
             $table->string('author')->nullable();
@@ -26,6 +27,7 @@ return new class extends Migration
             $table->integer('read_count')->default(0);
             $table->integer('comment_count')->default(0);
             $table->string('style')->nullable();
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
     }

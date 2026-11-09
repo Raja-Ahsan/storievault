@@ -11,8 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (! Schema::hasTable('categories')) {
+            return;
+        }
+
         // Check if slug column already exists
-        if (!Schema::hasColumn('categories', 'slug')) {
+        if (! Schema::hasColumn('categories', 'slug')) {
             Schema::table('categories', function (Blueprint $table) {
                 $table->string('slug')->nullable()->after('name');
             });
@@ -25,8 +29,9 @@ return new class extends Migration
             $category->save();
         }
 
-        // Make slug unique and not nullable if not already
-        if (Schema::hasColumn('categories', 'slug')) {
+        // Fresh installs already create slug as unique/not nullable.
+        $slug = collect(Schema::getColumns('categories'))->firstWhere('name', 'slug');
+        if ($slug && ($slug['nullable'] ?? false)) {
             Schema::table('categories', function (Blueprint $table) {
                 $table->string('slug')->unique()->nullable(false)->change();
             });
@@ -38,6 +43,10 @@ return new class extends Migration
      */
     public function down(): void
     {
+        if (! Schema::hasTable('categories') || ! Schema::hasColumn('categories', 'slug')) {
+            return;
+        }
+
         Schema::table('categories', function (Blueprint $table) {
             $table->dropColumn('slug');
         });

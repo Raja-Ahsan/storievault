@@ -47,6 +47,14 @@ trait CreatesStripeTestSchema
             $table->boolean('is_active')->default(true);
             $table->boolean('is_public')->default(true);
             $table->string('invite_token', 64)->nullable();
+            $table->boolean('discount_enabled')->default(false);
+            $table->string('discount_type', 20)->nullable();
+            $table->unsignedInteger('discount_value')->nullable();
+            $table->string('discount_duration', 20)->nullable();
+            $table->unsignedInteger('discount_duration_in_months')->nullable();
+            $table->timestamp('discount_starts_at')->nullable();
+            $table->timestamp('discount_ends_at')->nullable();
+            $table->string('stripe_coupon_id')->nullable();
             $table->timestamps();
         });
 

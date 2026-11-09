@@ -11,8 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // categories is created later (2025_12_01_...); no-op on fresh installs.
+        if (! Schema::hasTable('categories') || Schema::hasColumn('categories', 'faqs')) {
+            return;
+        }
+
         Schema::table('categories', function (Blueprint $table) {
-            $table->json('faqs')->nullable()->after('content');
+            $table->json('faqs')->nullable();
         });
     }
 
@@ -21,6 +26,10 @@ return new class extends Migration
      */
     public function down(): void
     {
+        if (! Schema::hasTable('categories') || ! Schema::hasColumn('categories', 'faqs')) {
+            return;
+        }
+
         Schema::table('categories', function (Blueprint $table) {
             $table->dropColumn('faqs');
         });

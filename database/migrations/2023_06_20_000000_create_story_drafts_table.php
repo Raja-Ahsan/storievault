@@ -15,7 +15,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('story_id')->constrained()->onDelete('cascade');
-            $table->foreignId('character_id')->nullable()->constrained('characters')->onDelete('set null');
+            // FK added after characters table exists (2025_05_02_234558_...)
+            $table->foreignId('character_id')->nullable();
             $table->string('title');
             $table->longText('content');
             $table->longText('html_content')->nullable();

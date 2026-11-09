@@ -355,6 +355,8 @@ class StripeCheckoutService
         $customerId = $this->ensureCustomer($user);
         $domain = rtrim((string) config('app.url'), '/');
 
+        $couponId = app(PackageDiscountService::class)->checkoutCouponId($package);
+
         $params = [
             'mode' => 'subscription',
             'customer' => $customerId,
@@ -370,6 +372,10 @@ class StripeCheckoutService
                 'user_id' => (string) $user->id,
                 'package_id' => (string) $package->id,
                 'checkout_type' => 'subscription',
+                'discount_applied' => $couponId ? 'true' : 'false',
+                'stripe_coupon_id' => $couponId ?? '',
+                'display_price_cents' => (string) $package->display_price_cents,
+                'original_price_cents' => (string) ($package->price_cents ?? 0),
             ],
             'subscription_data' => [
                 'metadata' => [
@@ -379,9 +385,21 @@ class StripeCheckoutService
             ],
         ];
 
+        // Auto-apply package coupon — never stack with allow_promotion_codes.
+        if ($couponId) {
+            $params['discounts'] = [
+                ['coupon' => $couponId],
+            ];
+        }
+
         try {
             return $this->client->checkout->sessions->create($params, [
-                'idempotency_key' => $this->idempotencyKey('sub', $user->id, $package->id),
+                'idempotency_key' => $this->idempotencyKey(
+                    $couponId ? 'sub_disc' : 'sub',
+                    $user->id,
+                    $package->id,
+                    $package->display_price_cents
+                ),
             ]);
         } catch (ApiErrorException $e) {
             throw $this->mapStripeApiError($e, 'subscription checkout');

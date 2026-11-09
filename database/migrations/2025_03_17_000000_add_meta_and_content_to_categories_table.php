@@ -11,11 +11,22 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('categories', function (Blueprint $table) {
-            $table->string('meta_title')->nullable()->after('slug');
-            $table->string('meta_description', 512)->nullable()->after('meta_title');
-            $table->longText('content')->nullable()->after('meta_description');
-        });
+        // categories is created later (2025_12_01_...); no-op on fresh installs.
+        if (! Schema::hasTable('categories')) {
+            return;
+        }
+
+        $columns = [
+            'meta_title' => fn (Blueprint $table) => $table->string('meta_title')->nullable(),
+            'meta_description' => fn (Blueprint $table) => $table->string('meta_description', 512)->nullable(),
+            'content' => fn (Blueprint $table) => $table->longText('content')->nullable(),
+        ];
+
+        foreach ($columns as $name => $definition) {
+            if (! Schema::hasColumn('categories', $name)) {
+                Schema::table('categories', $definition);
+            }
+        }
     }
 
     /**
@@ -23,8 +34,19 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('categories', function (Blueprint $table) {
-            $table->dropColumn(['meta_title', 'meta_description', 'content']);
-        });
+        if (! Schema::hasTable('categories')) {
+            return;
+        }
+
+        $columns = array_values(array_filter(
+            ['meta_title', 'meta_description', 'content'],
+            fn (string $column) => Schema::hasColumn('categories', $column)
+        ));
+
+        if ($columns !== []) {
+            Schema::table('categories', function (Blueprint $table) use ($columns) {
+                $table->dropColumn($columns);
+            });
+        }
     }
 };

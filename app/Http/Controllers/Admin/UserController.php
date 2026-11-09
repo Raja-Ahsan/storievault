@@ -19,8 +19,13 @@ class UserController extends Controller
         // Clean up old guest users (older than 24 hours)
         $this->cleanupOldGuestUsers();
         
-        // Get regular users (non-guest) for admin panel with subscription data
-        $query = User::where('is_guest', false)->with(['subscription.package']);
+        // List only regular users — hide guests and admins from this page
+        $query = User::where('is_guest', false)
+            ->where('role', '!=', 'admin')
+            ->where(function ($q) {
+                $q->whereNull('is_admin')->orWhere('is_admin', false);
+            })
+            ->with(['subscription.package']);
         
         // Add search functionality
         if (request()->has('search') && !empty(request('search'))) {

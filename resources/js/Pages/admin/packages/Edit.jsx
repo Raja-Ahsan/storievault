@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Head, useForm, Link } from '@inertiajs/react';
 import DashboardLayout from '../../../Layouts/DashboardLayout';
 import { Icons } from '../../../utils/icons';
+import PackageDiscountFields, { toDateInputValue } from '../../../Components/admin/PackageDiscountFields';
 import Swal from 'sweetalert2';
 import {
   CButton,
@@ -27,7 +28,7 @@ const themeColors = {
 };
 
 const Edit = ({ package: pkg, flash }) => {
-  const { data, setData, post, processing, errors } = useForm({
+  const { data, setData, post, processing, errors, transform } = useForm({
     name: pkg.name || '',
     badge: pkg.badge || '',
     price_cents: pkg.price_cents || '',
@@ -46,6 +47,13 @@ const Edit = ({ package: pkg, flash }) => {
     words_limit: pkg.words_limit || '',
     stories_limit: pkg.stories_limit || '',
     is_active: pkg.is_active ? '1' : '0',
+    discount_enabled: !!pkg.discount_enabled,
+    discount_type: pkg.discount_type || '',
+    discount_value: pkg.discount_value || '',
+    discount_duration: pkg.discount_duration || '',
+    discount_duration_in_months: pkg.discount_duration_in_months || '',
+    discount_starts_at: toDateInputValue(pkg.discount_starts_at),
+    discount_ends_at: toDateInputValue(pkg.discount_ends_at),
     _method: 'PUT', // For method spoofing (PUT request)
   });
 
@@ -116,7 +124,8 @@ const Edit = ({ package: pkg, flash }) => {
       newErrors.name = 'Package name is required';
     }
 
-    if (data.price_cents && (isNaN(data.price_cents) || data.price_cents < 0)) {
+    if (data.price_cents !== '' && data.price_cents !== null && data.price_cents !== undefined
+      && (isNaN(data.price_cents) || data.price_cents < 0)) {
       newErrors.price_cents = 'Price must be a valid positive number';
     }
 
@@ -124,26 +133,44 @@ const Edit = ({ package: pkg, flash }) => {
       newErrors.interval = 'Please select a valid interval';
     }
 
-    if (!data.words_limit || isNaN(data.words_limit) || data.words_limit <= 0) {
-      newErrors.words_limit = 'Valid words limit is required';
+    // words_limit / stories_limit are optional (many packages have null)
+    if (data.words_limit !== '' && data.words_limit !== null && data.words_limit !== undefined
+      && (isNaN(data.words_limit) || data.words_limit < 0)) {
+      newErrors.words_limit = 'Words limit must be a valid number';
     }
 
-    if (!data.stories_limit || isNaN(data.stories_limit) || data.stories_limit <= 0) {
-      newErrors.stories_limit = 'Valid stories limit is required';
+    if (data.stories_limit !== '' && data.stories_limit !== null && data.stories_limit !== undefined
+      && (isNaN(data.stories_limit) || data.stories_limit < 0)) {
+      newErrors.stories_limit = 'Stories limit must be a valid number';
     }
 
-    return Object.keys(newErrors).length === 0;
+    if (data.discount_enabled) {
+      if (!data.discount_type) newErrors.discount_type = 'Select a discount type.';
+      if (!data.discount_value) newErrors.discount_value = 'Enter a discount value.';
+      if (!data.discount_duration) newErrors.discount_duration = 'Select a discount duration.';
+      if (data.discount_duration === 'repeating'
+        && (!data.discount_duration_in_months || data.discount_duration_in_months < 1)) {
+        newErrors.discount_duration_in_months = 'Enter at least 1 month.';
+      }
+      if (data.discount_starts_at && data.discount_ends_at
+        && data.discount_ends_at < data.discount_starts_at) {
+        newErrors.discount_ends_at = 'End date must be on or after the start date.';
+      }
+    }
+
+    return { ok: Object.keys(newErrors).length === 0, errors: newErrors };
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Validate form before submission
-    if (!validateForm()) {
+    const { ok, errors: clientErrors } = validateForm();
+    if (!ok) {
+      const firstError = Object.values(clientErrors)[0] || 'Please check your input and try again.';
       Swal.fire({
         icon: 'error',
         title: 'Validation Error!',
-        text: 'Please check your input and try again.',
+        text: firstError,
         confirmButtonColor: themeColors.primary,
         background: '#fff',
         customClass: {
@@ -167,6 +194,17 @@ const Edit = ({ package: pkg, flash }) => {
     // Filter out empty features
     const featuresArray = data.features.filter(f => f && f.trim());
     setData('features', featuresArray);
+
+    transform((form) => ({
+      ...form,
+      features: featuresArray,
+      is_active: form.is_active === '1' || form.is_active === true,
+      discount_enabled: !!form.discount_enabled,
+      discount_starts_at: form.discount_starts_at || null,
+      discount_ends_at: form.discount_ends_at || null,
+      words_limit: form.words_limit === '' || form.words_limit === null ? null : Number(form.words_limit),
+      stories_limit: form.stories_limit === '' || form.stories_limit === null ? null : Number(form.stories_limit),
+    }));
 
     post(route('admin-dashboard.packages.update', pkg.id), {
       preserveScroll: true,
@@ -193,6 +231,13 @@ const Edit = ({ package: pkg, flash }) => {
         else if (errors.price_cents) errorMessage = errors.price_cents;
         else if (errors.interval) errorMessage = errors.interval;
         else if (errors.stripe_price_id) errorMessage = errors.stripe_price_id;
+        else if (errors.stripe) errorMessage = errors.stripe;
+        else if (errors.discount_enabled) errorMessage = errors.discount_enabled;
+        else if (errors.discount_type) errorMessage = errors.discount_type;
+        else if (errors.discount_value) errorMessage = errors.discount_value;
+        else if (errors.discount_duration) errorMessage = errors.discount_duration;
+        else if (errors.discount_starts_at) errorMessage = errors.discount_starts_at;
+        else if (errors.discount_ends_at) errorMessage = errors.discount_ends_at;
         else if (errors.words_limit) errorMessage = errors.words_limit;
         else if (errors.stories_limit) errorMessage = errors.stories_limit;
         else if (errors.features) errorMessage = errors.features;
@@ -301,6 +346,12 @@ const Edit = ({ package: pkg, flash }) => {
                     {/* Removed validationErrors.price_cents */}
                   </CCol>
                 </CRow>
+
+                <PackageDiscountFields
+                  data={data}
+                  setData={setData}
+                  errors={errors}
+                />
 
                 <CRow className="mb-3">
                   <CCol md={6}>

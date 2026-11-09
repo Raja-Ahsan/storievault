@@ -3,12 +3,14 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\StorePackageRequest;
+use App\Http\Requests\Admin\UpdatePackageRequest;
 use App\Models\Package;
 use App\Services\Stripe\PackageCatalogService;
+use App\Services\Stripe\PackageDiscountService;
 use App\Services\Stripe\StripeAccountService;
 use App\Services\Stripe\StripeCheckoutService;
 use Exception;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 use Stripe\Price;
@@ -30,23 +32,12 @@ class PackagesController extends Controller
         return Inertia::render('admin/packages/Create');
     }
 
-    public function store(Request $request, StripeAccountService $accounts)
-    {
-        $data = $request->validate([
-            'name' => 'required|string',
-            'badge' => 'nullable|string',
-            'price_cents' => 'nullable|integer|min:0',
-            'words_limit' => 'nullable|integer|min:0',
-            'stories_limit' => 'nullable|integer|min:0',
-            'interval' => 'nullable|string|in:monthly,yearly',
-            'features' => 'nullable|array',
-            'is_active' => 'boolean',
-        ]);
-
-        $data['features'] = isset($data['features']) && is_array($data['features'])
-            ? $data['features']
-            : [];
-        $data['is_active'] = $data['is_active'] ?? true;
+    public function store(
+        StorePackageRequest $request,
+        StripeAccountService $accounts,
+        PackageDiscountService $discounts,
+    ) {
+        $data = $this->normalizePackagePayload($request->validated());
 
         try {
             Stripe::setApiKey(config('services.stripe.secret'));
@@ -83,6 +74,8 @@ class PackagesController extends Controller
             $data['stripe_account_id'] = $accountId;
 
             $package = Package::create($data);
+
+            $discounts->sync($package->fresh());
 
             if (! empty($package->stripe_price_id)) {
                 app(StripeCheckoutService::class)->forgetPriceAvailabilityCache($package->stripe_price_id);
@@ -123,24 +116,16 @@ class PackagesController extends Controller
         ]);
     }
 
-    public function update(Request $request, Package $package, PackageCatalogService $catalog, StripeAccountService $accounts)
-    {
+    public function update(
+        UpdatePackageRequest $request,
+        Package $package,
+        PackageCatalogService $catalog,
+        StripeAccountService $accounts,
+        PackageDiscountService $discounts,
+    ) {
         $this->ensureCurrentAccountPackage($package, $catalog);
 
-        $data = $request->validate([
-            'name' => 'required|string',
-            'badge' => 'nullable|string',
-            'price_cents' => 'nullable|integer|min:0',
-            'interval' => 'nullable|string',
-            'words_limit' => 'nullable|integer',
-            'stories_limit' => 'nullable|integer',
-            'features' => 'nullable|array',
-            'is_active' => 'nullable|boolean',
-        ]);
-
-        $data['features'] = isset($data['features']) && is_array($data['features'])
-            ? $data['features']
-            : [];
+        $data = $this->normalizePackagePayload($request->validated());
 
         try {
             Stripe::setApiKey(config('services.stripe.secret'));
@@ -165,8 +150,15 @@ class PackagesController extends Controller
                     'description' => implode(', ', $data['features'] ?? []),
                 ]);
 
-                if ((int) ($data['price_cents'] ?? 0) !== (int) $package->price_cents
-                    || ($data['interval'] ?? null) !== $package->interval) {
+                // Keep existing Stripe Price unless admin explicitly changed price/interval
+                // (Edit UI currently locks price — this path remains for API/future use).
+                if (array_key_exists('price_cents', $data)
+                    && array_key_exists('interval', $data)
+                    && (
+                        (int) ($data['price_cents'] ?? 0) !== (int) $package->price_cents
+                        || ($data['interval'] ?? null) !== $package->interval
+                    )
+                ) {
                     $interval = $data['interval'] ?? 'month';
 
                     $newPrice = Price::create([
@@ -185,6 +177,8 @@ class PackagesController extends Controller
             $data['stripe_account_id'] = $accountId;
             $package->update($data);
 
+            $discounts->sync($package->fresh());
+
             if (! empty($package->stripe_price_id)) {
                 app(StripeCheckoutService::class)->forgetPriceAvailabilityCache($package->stripe_price_id);
             }
@@ -202,12 +196,17 @@ class PackagesController extends Controller
         }
     }
 
-    public function destroy(Package $package, PackageCatalogService $catalog)
-    {
+    public function destroy(
+        Package $package,
+        PackageCatalogService $catalog,
+        PackageDiscountService $discounts,
+    ) {
         $this->ensureCurrentAccountPackage($package, $catalog);
 
         try {
             Stripe::setApiKey(config('services.stripe.secret'));
+
+            $discounts->deactivateCoupon($package);
 
             $productId = $package->stripe_product_id;
 
@@ -240,5 +239,42 @@ class PackagesController extends Controller
         if (! $catalog->belongsToCurrentAccount($package)) {
             abort(404);
         }
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     */
+    protected function normalizePackagePayload(array $data): array
+    {
+        $data['features'] = isset($data['features']) && is_array($data['features'])
+            ? array_values(array_filter($data['features'], fn ($f) => is_string($f) && trim($f) !== ''))
+            : [];
+
+        $data['is_active'] = $data['is_active'] ?? true;
+        $data['discount_enabled'] = (bool) ($data['discount_enabled'] ?? false);
+
+        if (! $data['discount_enabled']) {
+            $data['discount_type'] = null;
+            $data['discount_value'] = null;
+            $data['discount_duration'] = null;
+            $data['discount_duration_in_months'] = null;
+            $data['discount_starts_at'] = null;
+            $data['discount_ends_at'] = null;
+        } else {
+            if (($data['discount_duration'] ?? null) !== 'repeating') {
+                $data['discount_duration_in_months'] = null;
+            }
+
+            // Date-only inputs: start at beginning of day, end at end of day (inclusive).
+            if (! empty($data['discount_starts_at'])) {
+                $data['discount_starts_at'] = \Carbon\Carbon::parse($data['discount_starts_at'])->startOfDay();
+            }
+            if (! empty($data['discount_ends_at'])) {
+                $data['discount_ends_at'] = \Carbon\Carbon::parse($data['discount_ends_at'])->endOfDay();
+            }
+        }
+
+        return $data;
     }
 }

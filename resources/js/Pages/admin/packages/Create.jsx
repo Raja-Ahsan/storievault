@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Head, useForm, Link } from "@inertiajs/react";
 import DashboardLayout from "../../../Layouts/DashboardLayout";
 import { Icons } from "../../../utils/icons";
+import PackageDiscountFields from "../../../Components/admin/PackageDiscountFields";
 import Swal from 'sweetalert2';
 import {
     CButton,
@@ -37,6 +38,13 @@ const Create = ({ flash }) => {
         is_active: "1",
         words_limit: "",
         stories_limit: "",
+        discount_enabled: false,
+        discount_type: "",
+        discount_value: "",
+        discount_duration: "",
+        discount_duration_in_months: "",
+        discount_starts_at: "",
+        discount_ends_at: "",
     });
 
     // Handle flash messages with SweetAlert
@@ -160,6 +168,9 @@ const Create = ({ flash }) => {
             name: (form.name || "").trim(),
             features: featuresArray,
             is_active: form.is_active === "1" || form.is_active === true,
+            discount_enabled: !!form.discount_enabled,
+            discount_starts_at: form.discount_starts_at || null,
+            discount_ends_at: form.discount_ends_at || null,
         }));
 
         post(route("admin-dashboard.packages.store"), {
@@ -338,6 +349,12 @@ const Create = ({ flash }) => {
                                         )}
                                     </CCol>
                                 </CRow>
+
+                                <PackageDiscountFields
+                                    data={data}
+                                    setData={setData}
+                                    errors={errors}
+                                />
 
                                 <CRow className="mb-3">
                                     <CCol md={6}>

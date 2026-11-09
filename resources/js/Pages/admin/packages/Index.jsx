@@ -168,9 +168,27 @@ function Index({ packages, flash, stripe_account_id = null }) {
                                             <CTableRow key={pkg.id}>
                                                 <CTableDataCell>{pkg.name || 'N/A'}</CTableDataCell>
                                                 <CTableDataCell>
-                                                    {pkg.price_cents !== null
-                                                        ? `$${(pkg.price_cents / 100).toFixed(2)}`
-                                                        : 'Free'}
+                                                    {pkg.price_cents !== null ? (
+                                                        <div>
+                                                            {pkg.discount_active ? (
+                                                                <>
+                                                                    <span className="text-decoration-line-through text-muted me-1">
+                                                                        ${((pkg.price_cents || 0) / 100).toFixed(2)}
+                                                                    </span>
+                                                                    <strong>
+                                                                        ${((pkg.display_price_cents ?? pkg.price_cents) / 100).toFixed(2)}
+                                                                    </strong>
+                                                                    {pkg.discount_badge && (
+                                                                        <CBadge color="danger" className="ms-1">{pkg.discount_badge}</CBadge>
+                                                                    )}
+                                                                </>
+                                                            ) : (
+                                                                `$${(pkg.price_cents / 100).toFixed(2)}`
+                                                            )}
+                                                        </div>
+                                                    ) : (
+                                                        'Free'
+                                                    )}
                                                 </CTableDataCell>
                                                 <CTableDataCell>{pkg.interval || '-'}</CTableDataCell>
                                                 <CTableDataCell>
